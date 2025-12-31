@@ -1,4 +1,4 @@
-import { HTMLAttributes, forwardRef } from 'react';
+import { HTMLAttributes } from 'react';
 
 type SectionVariant = 'default' | 'dark' | 'mint' | 'cream';
 type SectionPadding = 'none' | 'sm' | 'md' | 'lg' | 'xl';
@@ -24,32 +24,24 @@ const paddingStyles: Record<SectionPadding, string> = {
   xl: 'py-24 md:py-32',
 };
 
-export const Section = forwardRef<HTMLElement, SectionProps>(
-  (
-    {
-      children,
-      variant = 'default',
-      padding = 'lg',
-      as: Tag = 'section',
-      className = '',
-      ...props
-    },
-    ref
-  ) => {
-    return (
-      <Tag
-        ref={ref as React.Ref<HTMLElement>}
-        className={`
-          ${variantStyles[variant]}
-          ${paddingStyles[padding]}
-          ${className}
-        `.trim().replace(/\s+/g, ' ')}
-        {...props}
-      >
-        {children}
-      </Tag>
-    );
-  }
-);
-
-Section.displayName = 'Section';
+export function Section({
+  children,
+  variant = 'default',
+  padding = 'lg',
+  as: Tag = 'section',
+  className = '',
+  ...props
+}: SectionProps) {
+  return (
+    <Tag
+      className={`
+        ${variantStyles[variant]}
+        ${paddingStyles[padding]}
+        ${className}
+      `.trim().replace(/\s+/g, ' ')}
+      {...props}
+    >
+      {children}
+    </Tag>
+  );
+}
