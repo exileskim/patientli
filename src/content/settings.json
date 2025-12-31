@@ -1,0 +1,218 @@
+{
+  "siteName": "Patientli",
+  "siteDescription": "Patientli helps healthcare practices connect with more patients and thrive with modern brands, websites and marketing strategies.",
+  "logo": {
+    "light": "/images/patientli-logo-light.svg",
+    "dark": "/images/patientli-logo-dark.svg"
+  },
+  "navigation": [
+    {
+      "label": "Services",
+      "href": "/services",
+      "children": [
+        {
+          "label": "Brand Design",
+          "href": "/services/brand-design"
+        },
+        {
+          "label": "Website Design",
+          "href": "/services/healthcare-website-design"
+        },
+        {
+          "label": "Search Engine Optimization",
+          "href": "/services/search-engine-optimization"
+        },
+        {
+          "label": "Content Marketing",
+          "href": "/services/content-marketing"
+        },
+        {
+          "label": "Digital Advertising",
+          "href": "/services/digital-advertising-management"
+        },
+        {
+          "label": "Review Management",
+          "href": "/services/review-and-reputation-management"
+        },
+        {
+          "label": "Social Media",
+          "href": "/services/social-media-management"
+        }
+      ]
+    },
+    {
+      "label": "Solutions",
+      "href": "/solutions",
+      "children": [
+        {
+          "label": "For Dental Practices",
+          "href": "/solutions/dental-practices"
+        },
+        {
+          "label": "For Orthodontic Practices",
+          "href": "/solutions/orthodontic-practices"
+        },
+        {
+          "label": "For Cosmetic Dentistry",
+          "href": "/solutions/cosmetic-dentistry-practices"
+        },
+        {
+          "label": "For Chiropractic Practices",
+          "href": "/solutions/chiropractic-practices"
+        },
+        {
+          "label": "For Dermatology",
+          "href": "/solutions/dermatology-practices"
+        },
+        {
+          "label": "For Optometry",
+          "href": "/solutions/optometry-practices"
+        },
+        {
+          "label": "For Plastic Surgery",
+          "href": "/solutions/plastic-surgery-practices"
+        },
+        {
+          "label": "DSO Marketing Agency",
+          "href": "/solutions/dso-marketing-agency"
+        }
+      ]
+    },
+    {
+      "label": "Resources",
+      "href": "/resources",
+      "children": [
+        {
+          "label": "All Resources",
+          "href": "/resources"
+        },
+        {
+          "label": "E-Books",
+          "href": "/resources?type=e-book"
+        },
+        {
+          "label": "Reports",
+          "href": "/resources?type=report"
+        },
+        {
+          "label": "Templates",
+          "href": "/resources?type=template"
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "about": "Patientli helps doctors and dentists get more patients with our transparent, research-backed marketing approach.",
+    "sections": [
+      {
+        "title": "Services",
+        "links": [
+          {
+            "label": "Answer Engine Optimization",
+            "href": "/services/answer-engine-optimization"
+          },
+          {
+            "label": "Brand Design",
+            "href": "/services/brand-design"
+          },
+          {
+            "label": "Content Marketing",
+            "href": "/services/content-marketing"
+          },
+          {
+            "label": "Digital Advertising Management",
+            "href": "/services/digital-advertising-management"
+          },
+          {
+            "label": "Healthcare Website Design",
+            "href": "/services/healthcare-website-design"
+          },
+          {
+            "label": "Review and Reputation Management",
+            "href": "/services/review-and-reputation-management"
+          },
+          {
+            "label": "Search Engine Optimization",
+            "href": "/services/search-engine-optimization"
+          },
+          {
+            "label": "Social Media Management",
+            "href": "/services/social-media-management"
+          }
+        ]
+      },
+      {
+        "title": "Solutions",
+        "links": [
+          {
+            "label": "DSO Marketing Agency",
+            "href": "/solutions/dso-marketing-agency"
+          },
+          {
+            "label": "For Chiropractic Practices",
+            "href": "/solutions/chiropractic-practices"
+          },
+          {
+            "label": "For Cosmetic Dentistry Practices",
+            "href": "/solutions/cosmetic-dentistry-practices"
+          },
+          {
+            "label": "For Dental Practices",
+            "href": "/solutions/dental-practices"
+          },
+          {
+            "label": "For Dermatology Practices",
+            "href": "/solutions/dermatology-practices"
+          },
+          {
+            "label": "For Optometry Practices",
+            "href": "/solutions/optometry-practices"
+          },
+          {
+            "label": "For Orthodontic Practices",
+            "href": "/solutions/orthodontic-practices"
+          },
+          {
+            "label": "For Plastic Surgery Practices",
+            "href": "/solutions/plastic-surgery-practices"
+          },
+          {
+            "label": "Looks",
+            "href": "/looks"
+          }
+        ]
+      },
+      {
+        "title": "Company",
+        "links": [
+          {
+            "label": "Resources",
+            "href": "/resources"
+          },
+          {
+            "label": "Insights",
+            "href": "/insights"
+          },
+          {
+            "label": "Partner Program",
+            "href": "/partner-program"
+          },
+          {
+            "label": "Get a Demo",
+            "href": "/demo"
+          },
+          {
+            "label": "Contact Us",
+            "href": "/contact"
+          },
+          {
+            "label": "Legal",
+            "href": "/legal"
+          }
+        ]
+      }
+    ],
+    "copyright": "Copyright 2025 Patientli. Made by Form + Function"
+  },
+  "social": []
+}
