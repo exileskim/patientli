@@ -2,6 +2,14 @@ import { Header, Footer } from '@/components/layout';
 import { Container, Section } from '@/components/ui';
 import { notFound } from 'next/navigation';
 
+export async function generateStaticParams() {
+  return [
+    { slug: 'how-patients-find-providers' },
+    { slug: 'hims-hers-branding' },
+    { slug: 'tend-patient-experience' },
+  ];
+}
+
 // Resources data
 const resources: Record<string, {
   title: string;

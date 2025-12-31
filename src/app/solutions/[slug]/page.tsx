@@ -2,6 +2,19 @@ import { Header, Footer } from '@/components/layout';
 import { Container, Section } from '@/components/ui';
 import { notFound } from 'next/navigation';
 
+export async function generateStaticParams() {
+  return [
+    { slug: 'dental-practices' },
+    { slug: 'orthodontic-practices' },
+    { slug: 'cosmetic-dentistry-practices' },
+    { slug: 'chiropractic-practices' },
+    { slug: 'dermatology-practices' },
+    { slug: 'optometry-practices' },
+    { slug: 'plastic-surgery-practices' },
+    { slug: 'dso-marketing-agency' },
+  ];
+}
+
 // Solutions data
 const solutions: Record<string, {
   title: string;
