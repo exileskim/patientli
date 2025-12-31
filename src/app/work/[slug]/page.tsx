@@ -2,13 +2,6 @@ import { Header, Footer } from '@/components/layout';
 import { Container, Section } from '@/components/ui';
 import { notFound } from 'next/navigation';
 
-export async function generateStaticParams() {
-  return [
-    { slug: 'forestville-family-dentistry-website-brand' },
-    { slug: 'moore-pascarella-heinzen-brand-website' },
-    { slug: 'mpdg-dental-web-design-example' },
-  ];
-}
 
 // This would typically come from a CMS or database
 const caseStudies: Record<string, {

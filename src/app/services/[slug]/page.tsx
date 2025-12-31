@@ -2,18 +2,6 @@ import { Header, Footer } from '@/components/layout';
 import { Container, Section } from '@/components/ui';
 import { notFound } from 'next/navigation';
 
-export async function generateStaticParams() {
-  return [
-    { slug: 'healthcare-website-design' },
-    { slug: 'brand-design' },
-    { slug: 'search-engine-optimization' },
-    { slug: 'content-marketing' },
-    { slug: 'digital-advertising-management' },
-    { slug: 'review-and-reputation-management' },
-    { slug: 'social-media-management' },
-    { slug: 'answer-engine-optimization' },
-  ];
-}
 
 // Service pages data
 const services: Record<string, {

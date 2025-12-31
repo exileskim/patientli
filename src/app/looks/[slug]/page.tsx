@@ -62,11 +62,6 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  return looksData.map((look) => ({
-    slug: look.slug,
-  }));
-}
 
 export default function LookDetailPage({ params }: PageProps) {
   const [activeTab, setActiveTab] = useState<PreviewTab>('desktop');
