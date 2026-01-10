@@ -38,8 +38,8 @@ const resources: Record<string, {
   },
 };
 
-export default async function ResourcePage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default function ResourcePage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const resource = resources[slug];
 
   if (!resource) {
@@ -63,7 +63,7 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
               </h1>
               <a
                 href="/demo"
-                className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-[var(--color-accent-dark)] transition-colors font-medium"
+                className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-[var(--color-accent-hover)] transition-colors font-medium"
               >
                 Download now
               </a>

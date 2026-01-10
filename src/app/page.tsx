@@ -100,7 +100,7 @@ export default function Home() {
                 </p>
                 <Link
                   href={heroContent.cta.href}
-                  className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-accent)] text-black rounded-lg hover:bg-[var(--color-accent-dark)] transition-colors font-medium"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-accent)] text-black rounded-lg hover:bg-[var(--color-accent-hover)] transition-colors font-medium"
                   style={{ color: 'black' }}
                 >
                   {heroContent.cta.text}

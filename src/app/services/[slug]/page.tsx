@@ -51,8 +51,8 @@ const services: Record<string, {
   },
 };
 
-export default async function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default function ServicePage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const service = services[slug];
 
   if (!service) {
@@ -77,7 +77,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                 </p>
                 <a
                   href="/demo"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-[var(--color-accent-dark)] transition-colors font-medium"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-accent)] text-[var(--color-primary)] rounded-lg hover:bg-[var(--color-accent-hover)] transition-colors font-medium"
                 >
                   Schedule a call
                 </a>
@@ -97,7 +97,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
                 {service.heroText}
               </h2>
               <p className="text-lg text-[var(--color-text-secondary)]">
-                We're a new kind of dental marketing service that's been thoughtfully designed from the ground up to serve all of the marketing needs of growing practices. Our stunning designs and researched-backed marketing approaches help generate results for growth-minded dental businesses of all sizes.
+                We&apos;re a new kind of dental marketing service that&apos;s been thoughtfully designed from the ground up to serve all of the marketing needs of growing practices. Our stunning designs and researched-backed marketing approaches help generate results for growth-minded dental businesses of all sizes.
               </p>
             </div>
           </Container>

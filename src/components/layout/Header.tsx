@@ -101,30 +101,16 @@ const navigation: NavItem[] = [
     ],
   },
   {
+    label: 'Looks',
+    href: '/looks',
+  },
+  {
+    label: 'Pricing',
+    href: '/pricing',
+  },
+  {
     label: 'Resources',
     href: '/resources',
-    children: [
-      {
-        label: 'Partner Program',
-        href: '/partner-program',
-        description: 'Earn commissions by referring new clients.'
-      },
-      {
-        label: 'Contact Us',
-        href: '/contact',
-        description: 'Get in touch with our experts.'
-      },
-      {
-        label: 'Free Resources',
-        href: '/resources',
-        description: 'Guides, templates, and tools to elevate your practice.'
-      },
-      {
-        label: 'Insights',
-        href: '/insights',
-        description: 'Expert marketing insights for dental practices.'
-      },
-    ],
   },
 ];
 
@@ -165,18 +151,18 @@ export function Header({ variant = 'dark' }: HeaderProps) {
               <div
                 key={item.label}
                 className="relative"
-                onMouseEnter={() => setOpenDropdown(item.label)}
-                onMouseLeave={() => setOpenDropdown(null)}
+                onMouseEnter={() => (item.children ? setOpenDropdown(item.label) : null)}
+                onMouseLeave={() => (item.children ? setOpenDropdown(null) : null)}
               >
-                <button
-                  className={`
-                    flex items-center gap-1 py-2
-                    font-medium transition-colors
-                    ${isDark ? 'text-white hover:text-[var(--color-accent)]' : 'text-[var(--color-primary)] hover:text-[var(--color-primary-light)]'}
-                  `}
-                >
-                  {item.label}
-                  {item.children && (
+                {item.children ? (
+                  <button
+                    className={`
+                      flex items-center gap-1 py-2
+                      font-medium transition-colors
+                      ${isDark ? 'text-white hover:text-[var(--color-accent)]' : 'text-[var(--color-primary)] hover:text-[var(--color-primary-light)]'}
+                    `}
+                  >
+                    {item.label}
                     <svg
                       className={`w-4 h-4 transition-transform ${openDropdown === item.label ? 'rotate-180' : ''}`}
                       fill="none"
@@ -185,8 +171,19 @@ export function Header({ variant = 'dark' }: HeaderProps) {
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
-                  )}
-                </button>
+                  </button>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className={`
+                      flex items-center gap-1 py-2
+                      font-medium transition-colors
+                      ${isDark ? 'text-white hover:text-[var(--color-accent)]' : 'text-[var(--color-primary)] hover:text-[var(--color-primary-light)]'}
+                    `}
+                  >
+                    {item.label}
+                  </Link>
+                )}
 
                 {/* Mega Menu Dropdown */}
                 {item.children && openDropdown === item.label && (
@@ -234,7 +231,7 @@ export function Header({ variant = 'dark' }: HeaderProps) {
             ))}
           </div>
 
-          {/* CTA Button & Cart */}
+          {/* CTA Button */}
           <div className="hidden lg:flex items-center gap-4">
             <Link
               href="/demo"
@@ -243,31 +240,11 @@ export function Header({ variant = 'dark' }: HeaderProps) {
                 font-medium rounded-lg transition-colors
                 ${isDark
                   ? 'bg-white text-[var(--color-primary)] hover:bg-gray-100'
-                  : 'bg-[var(--color-accent)] text-[var(--color-primary)] hover:bg-[var(--color-accent-dark)]'
+                  : 'bg-[var(--color-accent)] text-[var(--color-primary)] hover:bg-[var(--color-accent-hover)]'
                 }
               `}
             >
               Schedule a call
-            </Link>
-
-            {/* Shopping Cart */}
-            <Link
-              href="/cart"
-              className="relative p-2"
-              aria-label="Shopping cart"
-            >
-              <svg
-                className={`w-6 h-6 ${isDark ? 'text-white' : 'text-[var(--color-primary)]'}`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              {/* Cart Badge */}
-              <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold bg-[var(--color-accent)] text-[var(--color-primary)] rounded-full">
-                1
-              </span>
             </Link>
           </div>
 

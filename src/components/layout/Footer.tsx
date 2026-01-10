@@ -33,11 +33,12 @@ const footerSections = [
   {
     title: 'Company',
     links: [
+      { label: 'Looks', href: '/looks' },
+      { label: 'Pricing', href: '/pricing' },
       { label: 'Resources', href: '/resources' },
-      { label: 'Insights', href: '/insights' },
-      { label: 'Partner Program', href: '/partner-program' },
       { label: 'Get a Demo', href: '/demo' },
-      { label: 'Contact Us', href: '/contact' },
+      { label: 'Sign In', href: '/auth/signin' },
+      { label: 'Client Portal', href: '/app' },
       { label: 'Legal', href: '/legal' },
     ],
   },
@@ -110,8 +111,8 @@ export function Footer() {
               <Link href="/privacy-policy" className="text-white/60 text-sm hover:text-white transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-white/60 text-sm hover:text-white transition-colors">
-                Terms of Service
+              <Link href="/terms-of-use" className="text-white/60 text-sm hover:text-white transition-colors">
+                Terms of Use
               </Link>
             </div>
           </div>

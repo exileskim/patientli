@@ -126,7 +126,7 @@ export function CardTitle({ children, as: Tag = 'h3', className = '', ...props }
   );
 }
 
-interface CardDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {}
+type CardDescriptionProps = HTMLAttributes<HTMLParagraphElement>;
 
 export function CardDescription({ children, className = '', ...props }: CardDescriptionProps) {
   return (

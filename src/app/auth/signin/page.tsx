@@ -8,28 +8,29 @@ import { Container } from '@/components/ui';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [emailSent, setEmailSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+    setEmailSent(false);
 
     try {
-      const result = await signIn('credentials', {
+      const result = await signIn('email', {
         email,
-        password,
         redirect: false,
+        callbackUrl: '/app',
       });
 
       if (result?.error) {
-        setError('Invalid email or password');
+        setError('Could not send sign-in email. Please try again.');
       } else {
-        window.location.href = '/account';
+        setEmailSent(true);
       }
-    } catch (err) {
+    } catch {
       setError('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
@@ -37,7 +38,7 @@ export default function SignInPage() {
   };
 
   const handleGoogleSignIn = () => {
-    signIn('google', { callbackUrl: '/account' });
+    signIn('google', { callbackUrl: '/app' });
   };
 
   return (
@@ -102,6 +103,12 @@ export default function SignInPage() {
                 </div>
               )}
 
+              {emailSent && (
+                <div className="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm">
+                  Check your email for a sign-in link. (In local dev, the link may be printed in the server logs.)
+                </div>
+              )}
+
               {/* Email Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -119,43 +126,18 @@ export default function SignInPage() {
                   />
                 </div>
 
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium mb-2">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="w-full px-4 py-3 border border-[var(--color-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
-                    placeholder="Enter your password"
-                  />
-                </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="rounded" />
-                    <span>Remember me</span>
-                  </label>
-                  <Link href="/auth/forgot-password" className="text-[var(--color-primary)] hover:underline">
-                    Forgot password?
-                  </Link>
-                </div>
-
                 <button
                   type="submit"
                   disabled={isLoading}
                   className="w-full py-4 px-6 bg-[var(--color-primary)] text-white rounded-full hover:bg-[var(--color-primary-dark)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? 'Signing in...' : 'Sign In'}
+                  {isLoading ? 'Sending link...' : 'Send sign-in link'}
                 </button>
               </form>
 
               {/* Sign Up Link */}
               <p className="mt-6 text-center text-sm text-[var(--color-text-secondary)]">
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <Link href="/pricing" className="text-[var(--color-primary)] hover:underline">
                   Get started
                 </Link>

@@ -1,11 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
+import { useEffect, useState } from 'react';
 import { Header, Footer } from '@/components/layout';
 import { Container } from '@/components/ui';
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 const plans = [
   {
@@ -49,6 +46,11 @@ const plans = [
 
 export default function PricingPage() {
   const [loading, setLoading] = useState<string | null>(null);
+  const [configId, setConfigId] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    setConfigId(new URLSearchParams(window.location.search).get('configId') ?? undefined);
+  }, []);
 
   const handleSubscribe = async (planKey: string) => {
     setLoading(planKey);
@@ -59,7 +61,7 @@ export default function PricingPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ planKey }),
+        body: JSON.stringify({ planKey, configId }),
       });
 
       const { url, error } = await response.json();
@@ -94,7 +96,7 @@ export default function PricingPage() {
               Choose a Patientli plan that works for you.
             </h1>
             <p className="text-lg text-[var(--color-text-secondary)] max-w-3xl mx-auto">
-              Whether you're just starting out or taking over the town, we've got a plan that will fit your needs.
+              Whether you&apos;re just starting out or taking over the town, we&apos;ve got a plan that will fit your needs.
               Patientli plans are designed to grow with you. No long commitments, upgrade or downgrade anytime.
             </p>
           </div>
@@ -168,7 +170,7 @@ export default function PricingPage() {
                   disabled={loading === plan.key}
                   className={`w-full py-4 px-6 rounded-full font-medium transition-colors ${
                     plan.popular
-                      ? 'bg-[var(--color-accent)] text-[var(--color-bg-dark)] hover:bg-[var(--color-accent-dark)]'
+                      ? 'bg-[var(--color-accent)] text-[var(--color-bg-dark)] hover:bg-[var(--color-accent-hover)]'
                       : 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)]'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
@@ -182,7 +184,7 @@ export default function PricingPage() {
           <div className="text-center mt-12">
             <p className="text-[var(--color-text-secondary)]">
               Have questions? {' '}
-              <a href="/contact" className="text-[var(--color-primary)] hover:underline">
+              <a href="/demo" className="text-[var(--color-primary)] hover:underline">
                 Schedule a call
               </a>
               {' '} with our team.

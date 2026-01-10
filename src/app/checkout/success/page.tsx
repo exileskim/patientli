@@ -35,7 +35,7 @@ export default function CheckoutSuccessPage() {
             {/* Description */}
             <p className="text-lg text-[var(--color-text-secondary)] mb-8">
               Thank you for your subscription. Your payment was successful and your account is now active.
-              We're excited to help you grow your practice!
+              We&apos;re excited to help you grow your practice!
             </p>
 
             {/* Next Steps */}
@@ -44,7 +44,7 @@ export default function CheckoutSuccessPage() {
               <ul className="space-y-3 text-[var(--color-text-secondary)]">
                 <li className="flex items-start gap-3">
                   <span className="w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm flex-shrink-0">1</span>
-                  <span>You'll receive a confirmation email with your subscription details.</span>
+                  <span>You&apos;ll receive a confirmation email with your subscription details.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm flex-shrink-0">2</span>
@@ -52,7 +52,7 @@ export default function CheckoutSuccessPage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-6 h-6 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center text-sm flex-shrink-0">3</span>
-                  <span>We'll start working on your custom Look and website right away.</span>
+                  <span>We&apos;ll start working on your custom Look and website right away.</span>
                 </li>
               </ul>
             </div>
@@ -60,7 +60,7 @@ export default function CheckoutSuccessPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/account"
+                href="/app"
                 className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-primary)] text-white rounded-full hover:bg-[var(--color-primary-dark)] transition-colors"
               >
                 Go to Dashboard

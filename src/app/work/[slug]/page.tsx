@@ -161,8 +161,8 @@ const caseStudies: Record<string, {
   },
 };
 
-export default async function WorkPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default function WorkPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const caseStudy = caseStudies[slug];
 
   if (!caseStudy) {

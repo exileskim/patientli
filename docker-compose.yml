@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: patientli
+      POSTGRES_PASSWORD: patientli
+      POSTGRES_DB: patientli
+    ports:
+      - "5432:5432"
+    volumes:
+      - patientli_postgres:/var/lib/postgresql/data
+
+volumes:
+  patientli_postgres:
+

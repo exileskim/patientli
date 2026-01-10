@@ -1,24 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Patientli marketing + Looks platform (Next.js App Router).
 
 ## Getting Started
 
-First, run the development server:
+### Prereqs
+- Node.js 20+
+- (Optional) Docker Desktop for local Postgres
+
+### Setup
+Run:
+
+```bash
+./scripts/dev-setup.sh
+```
+
+This will install dependencies, create `.env.local` from `.env.example`, and (if Docker is running) start Postgres and run Prisma migrate + seed.
+
+### Dev server
+Run:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## App routes
+- Looks gallery: `/looks`
+- Configurator: `/looks/[slug]`
+- Pricing: `/pricing`
+- Client portal: `/app`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Auth in dev
+If `RESEND_API_KEY` / `RESEND_FROM` are not set, magic-link URLs are printed to the server logs for local testing.
 
 ## Learn More
 
