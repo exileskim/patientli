@@ -26,16 +26,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const adobeKitId = process.env.NEXT_PUBLIC_ADOBE_KIT_ID ?? 'tam7fax';
-
   return (
     <html lang="en">
-      <head>
-        {/* Adobe Fonts - IvyPresto Display */}
-        {adobeKitId ? (
-          <link rel="stylesheet" href={`https://use.typekit.net/${adobeKitId}.css`} />
-        ) : null}
-      </head>
       <body className={`${outfit.variable} antialiased`}>
         {children}
       </body>

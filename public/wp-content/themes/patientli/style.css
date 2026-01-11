@@ -1,0 +1,284 @@
+/* 
+Theme Name: Patientli
+Theme URI: https://patient.li
+Description: Hello Elementor Child is a child theme of Hello Elementor, created by Elementor team
+Author: Elementor Team
+Author URI: https://elementor.com/
+Template: hello-elementor
+Version: 2.0.0
+Text Domain: hello-elementor-child
+License: GNU General Public License v3 or later.
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
+Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, featured-images, rtl-language-support, threaded-comments, translation-ready
+*/
+
+/* Add your custom styles here */
+
+.elementor-clickable {
+  cursor: pointer;
+}
+
+h1.elementor-heading-title span {
+    color: var(--e-global-color-e5ecab5);
+}
+
+h3.elementor-heading-title span, body.post-template-default.single.single-post h1.elementor-heading-title span {
+	color: inherit;
+	font-style: italic;
+}
+
+a[data-element_type="container"] {
+    text-decoration: none;
+}
+
+ul.elementor-sitemap-list {
+	padding: 0;
+}
+
+body.post-template-default.single.single-post h2 {
+    font-size: 36px;
+}
+
+blockquote {
+    border-left: 2px solid;
+    padding-left: 24px;
+	font-family: "ivypresto-display", Serif;
+}
+
+blockquote p:first-child {
+	font-size: 24px;
+}
+
+@media (min-width: 700px) {
+  .gallery {
+	  display: flex !important;
+	}
+}
+
+.fade-out-container {
+    -webkit-mask-image: linear-gradient(to bottom, 
+        rgba(0,0,0,1) 50%, 
+        rgba(0,0,0,0) 100%
+    );
+    mask-image: linear-gradient(to bottom, 
+        rgba(0,0,0,1) 50%, 
+        rgba(0,0,0,0) 100%
+    );
+}
+
+/* Elementor Mega Menu style fixes */
+
+.elementor-widget-n-menu button:hover, 
+.elementor-widget-n-menu button:focus {
+    background: none;
+    border: none;
+}
+
+.elementor-widget-n-menu .e-n-menu[data-layout=dropdown] .e-n-menu-toggle[aria-expanded=true]+.e-n-menu-wrapper {
+    margin-top: 16px;
+}
+
+.elementor-widget-n-menu .e-n-menu[data-layout=dropdown] .e-n-menu-wrapper {
+	background: #FFF;
+}
+
+#mega-menu-on-dark .e-n-menu[data-layout=dropdown] .e-n-menu-wrapper {
+    background: #112F35;
+}
+
+.elementor-widget-n-menu .e-n-menu[data-layout=dropdown] .e-n-menu-wrapper ul {
+    padding-bottom: 24px;
+    background: inherit;
+}
+
+@media (max-width: 1024px) {
+    .elementor-widget-n-menu .e-n-menu[data-layout=dropdown] .e-n-menu-wrapper {
+    	box-shadow: rgba(16, 48, 52, 0.7) 0px 5000px 0px 5000px !important;
+	}
+}
+
+/* Custom Statistic Blocks for Blog Posts */
+
+.stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .stats-row > div {
+    flex: 1 1 calc(33.333% - 20px);
+    border-radius: 40px;
+    padding: 30px;
+    box-sizing: border-box;
+  }
+  .stats-row > div:nth-child(1) { background: #F3F6B6; }
+  .stats-row > div:nth-child(2) { background: #F8F8F5; }
+  .stats-row > div:nth-child(3) { background: #E6F2EF; }
+
+  .stats-row h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+	font-family: "ivypresto-display", Serif;
+  }
+  .stats-row p {
+    margin: 5px 0;
+  }
+
+  @media (max-width: 768px) {
+    .stats-row > div {
+      flex: 1 1 100%;
+    }
+  }
+
+/* Woocommerce Styling */
+
+body.single-product .woocommerce-notices-wrapper, 
+.woocommerce-NoticeGroup.woocommerce-NoticeGroup-checkout, 
+body.woocommerce-account .woocommerce-notices-wrapper, 
+.elementor-wc-products ul.products li.product .price {
+    display: none !important;
+}
+
+.woocommerce-error, .woocommerce-info, .woocommerce-message {
+    border: none;
+    background: #fff;
+	font-family: "Outfit", sans-serif;
+    font-size: 18px;
+}
+
+.woocommerce-notices-wrapper {
+    display: none !important;
+}
+
+a.woocommerce-Button.wc-forward.button, 
+.woocommerce a.button.wc-forward {
+	color: #103034;
+    background-color: #fff;
+    padding: 10px 12px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #103034;
+    border-radius: 12px;
+}
+
+.woocommerce-info::before {
+    color: #103034;
+}
+
+a.button.product_type_simple.add_to_cart_button {
+    color: #e9e6ed;
+    font-size: 0px;
+    background-color: #fff;
+    border-style: solid;
+    border-width: 2px 2px 2px 2px;
+    border-color: #103034;
+    border-radius: 12px 12px 12px 12px;
+	transition: background var(--background-transition, .3s), border var(--border-transition, .3s), box-shadow var(--border-transition, .3s), transform var(--e-con-transform-transition-duration, .4s);
+}
+
+a.button.product_type_simple.add_to_cart_button:before {
+    font-size: 1rem;
+    content: 'Select';
+    color: #000;
+    width: 100%;
+    padding: .618em 1em;
+    display: block;
+}
+
+a.button.product_type_simple.add_to_cart_button:hover {
+    background-color: #103034;
+    border-color: #103034;
+
+}
+
+a.button.product_type_simple.add_to_cart_button:hover:before {
+	color: #fff;
+}
+
+/* Woocommerce Checkout Styling */
+.elementor-widget-woocommerce-checkout-page .woocommerce-checkout #payment #place_order {
+    font-size: 0px !important;
+    color: #10303400;
+    padding: 16px 24px;
+}
+
+.elementor-widget-woocommerce-checkout-page .woocommerce-checkout #payment #place_order:after {
+    content: 'Subscribe';
+    font-size: 18px;
+    color: #fff;
+}
+
+#checkout-cart-summary .e-cart__column-start form.woocommerce-cart-form .e-shop-table.e-cart-section, #checkout-cart-summary div.wc-proceed-to-checkout  {
+    display: none;
+}
+
+
+/* Custom Checkout Cart Shortcode Styling */
+
+body.woocommerce-checkout .custom-checkout-cart-items .cart-item {
+    margin-bottom: 24px;
+}
+
+body.woocommerce-checkout .custom-checkout-cart-items .cart-item-details {
+    padding-left: 24px;
+}
+
+body.woocommerce-checkout table.woocommerce-checkout-review-order-table td, table.woocommerce-checkout-review-order-table th {
+    border: none !important;
+    background: #f8f8f5;
+    text-align: left;
+    padding: 4px 0px;
+}
+
+body.woocommerce-checkout table.woocommerce-checkout-review-order-table thead, table.woocommerce-checkout-review-order-table tbody {
+    display: none !important;
+}
+
+/* Plugin: Woocommerce Min Max Quantities Styling */
+
+body.woocommerce-checkout div.woocommerce ul.woocommerce-error li[data-source="wcmmq"] {
+    font-size: 0;
+}
+
+body.woocommerce-checkout div.woocommerce ul.woocommerce-error li[data-source="wcmmq"]:after {
+    content: 'Please choose a subscription plan to proceed with your chosen Look.';
+    font-size: 16px;
+}
+
+body.woocommerce-checkout div.woocommerce a.button.wc-backward {
+    color: #112f34;
+    background: #112f34;
+    font-size: 0;
+    padding: 12px 24px;
+    border-radius: 12px;
+}
+
+body.woocommerce-checkout div.woocommerce a.button.wc-backward:before {
+    content: 'Choose your plan';
+    color: #fff;
+    font-size: 16px;
+}
+
+/* Elementor Menu Cart Widget Styling */
+
+a#elementor-menu-cart__toggle_button, a#elementor-menu-cart__toggle_button:focus {
+    background: #ffffff00;
+}
+
+body.cart-empty .elementor-widget-woocommerce-menu-cart {
+    display: none !important;
+}
+
+
+/* Product page scrolly mocks styling */
+.scrolly-mock {
+    height: 500px;
+    overflow-y: scroll; 
+}
+
+.scrolly-mock.preview-desktop {
+    max-width: 850px;
+}
+
+.scrolly-mock.preview-mobile {
+    max-width: 250px;
+}
