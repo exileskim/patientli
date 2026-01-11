@@ -1,33 +1,22 @@
-import type { ScriptHTMLAttributes } from 'react';
+import type { LinkHTMLAttributes, ScriptHTMLAttributes } from 'react';
 
-import { getWpEntry, normalizeWpPath } from '@/lib/wp-content';
+import type { WpHeadTag } from '@/lib/wp-content';
 
-interface MarketingHeadProps {
-  params: { slug?: string[] };
-}
-
-export default function Head({ params }: MarketingHeadProps) {
-  const pathname = normalizeWpPath(`/${params.slug?.join('/') ?? ''}`);
-  const entry = getWpEntry(pathname);
-
-  if (!entry) {
-    return null;
-  }
-
+export function WpHeadTags({ headTags }: { headTags: WpHeadTag[] }) {
   return (
     <>
-      {entry.headTags.map((tag, index) => {
+      {headTags.map((tag, index) => {
         if (tag.tag === 'link') {
-          return (
-            <link
-              key={tag.id ?? `${tag.href}-${tag.media ?? 'all'}`}
-              id={tag.id}
-              rel="stylesheet"
-              type={tag.type}
-              href={tag.href}
-              media={tag.media}
-            />
-          );
+          const key = tag.id ?? `${tag.href}-${tag.media ?? 'all'}`;
+          const props: LinkHTMLAttributes<HTMLLinkElement> = {
+            rel: 'stylesheet',
+            href: tag.href,
+            media: tag.media,
+            id: tag.id,
+            type: tag.type,
+          };
+
+          return <link key={key} {...props} />;
         }
 
         if (tag.tag === 'script') {

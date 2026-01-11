@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
-import { WpBodyClass, WpFooter, WpHeader } from '@/components/wp';
+import { WpBodyClass, WpFooter, WpHeader, WpHeadTags } from '@/components/wp';
 import { getWpEntry, getWpFile, getWpHtml, normalizeWpPath } from '@/lib/wp-content';
 
 interface MarketingPageProps {
@@ -37,6 +37,7 @@ export default function MarketingPage({ params }: MarketingPageProps) {
   return (
     <>
       <WpBodyClass className={entry.bodyClass} />
+      <WpHeadTags headTags={entry.headTags} />
       {beforeHtml ? <div dangerouslySetInnerHTML={{ __html: beforeHtml }} /> : null}
       <WpHeader htmlPath={entry.headerPath} />
       <div dangerouslySetInnerHTML={{ __html: html }} />
