@@ -1,11 +1,14 @@
 import type { LinkHTMLAttributes, ScriptHTMLAttributes } from 'react';
 
 import type { WpHeadTag } from '@/lib/wp-content';
+import { filterWpHeadTags } from '@/lib/wp-sanitize';
 
 export function WpHeadTags({ headTags }: { headTags: WpHeadTag[] }) {
+  const filtered = filterWpHeadTags(headTags);
+
   return (
     <>
-      {headTags.map((tag, index) => {
+      {filtered.map((tag, index) => {
         if (tag.tag === 'link') {
           const key = tag.id ?? `${tag.href}-${tag.media ?? 'all'}`;
           const props: LinkHTMLAttributes<HTMLLinkElement> = {

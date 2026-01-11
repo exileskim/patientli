@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 
 import { WpBodyClass, WpFooter, WpHeader, WpHeadTags } from '@/components/wp';
 import { getWpEntry, getWpFile, getWpHtml, normalizeWpPath } from '@/lib/wp-content';
+import { stripWpBodyHtml } from '@/lib/wp-sanitize';
 
 interface MarketingPageProps {
   params: { slug?: string[] };
@@ -31,8 +32,8 @@ export default function MarketingPage({ params }: MarketingPageProps) {
   }
 
   const html = getWpHtml(entry);
-  const beforeHtml = entry.beforePath ? getWpFile(entry.beforePath) : '';
-  const afterHtml = entry.afterPath ? getWpFile(entry.afterPath) : '';
+  const beforeHtml = entry.beforePath ? stripWpBodyHtml(getWpFile(entry.beforePath)) : '';
+  const afterHtml = entry.afterPath ? stripWpBodyHtml(getWpFile(entry.afterPath)) : '';
 
   return (
     <>
