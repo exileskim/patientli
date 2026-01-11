@@ -395,7 +395,7 @@ export function Header({ variant = 'dark' }: HeaderProps) {
           </div>
 
           {/* CTA Button */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4">
             <Link
               href="/demo"
               className={`

@@ -279,12 +279,12 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-3 lg:gap-12">
+            <div className="grid gap-6 md:grid-cols-3 [@media(min-width:1025px)]:gap-12">
               {insights.map((insight) => (
                 <Link
                   key={insight.href}
                   href={insight.href}
-                  className={`flex min-h-[400px] flex-col justify-between rounded-3xl p-8 lg:min-h-[600px] ${insight.textClassName}`}
+                  className={`flex min-h-[400px] flex-col gap-6 rounded-3xl p-8 [@media(min-width:1025px)]:min-h-[600px] ${insight.textClassName}`}
                   style={{
                     backgroundColor: insight.backgroundColor,
                     backgroundImage: `url(${insight.backgroundImage})`,
@@ -299,7 +299,7 @@ export default function Home() {
                     width={insight.logoWidth}
                     height={insight.logoHeight}
                   />
-                  <h3 className="font-display text-4xl font-medium leading-tight">{insight.title}</h3>
+                  <h3 className="font-display text-4xl font-medium leading-[1.125]">{insight.title}</h3>
                 </Link>
               ))}
             </div>
