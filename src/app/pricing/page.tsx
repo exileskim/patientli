@@ -64,11 +64,16 @@ export default function PricingPage() {
         body: JSON.stringify({ planKey, configId }),
       });
 
-      const { url, error } = await response.json();
+      const { url, error, redirect } = await response.json();
+
+      if (response.status === 401 && redirect) {
+        window.location.href = redirect;
+        return;
+      }
 
       if (error) {
         console.error('Checkout error:', error);
-        alert('Failed to start checkout. Please try again.');
+        alert(typeof error === 'string' ? error : 'Failed to start checkout. Please try again.');
         return;
       }
 

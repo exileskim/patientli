@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
-import { SessionProvider } from "@/components/providers/SessionProvider";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -27,7 +26,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const adobeKitId = process.env.NEXT_PUBLIC_ADOBE_KIT_ID;
+  const adobeKitId = process.env.NEXT_PUBLIC_ADOBE_KIT_ID ?? 'tam7fax';
 
   return (
     <html lang="en">
@@ -38,9 +37,7 @@ export default function RootLayout({
         ) : null}
       </head>
       <body className={`${outfit.variable} antialiased`}>
-        <SessionProvider>
-          {children}
-        </SessionProvider>
+        {children}
       </body>
     </html>
   );

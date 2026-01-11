@@ -33,12 +33,11 @@ const footerSections = [
   {
     title: 'Company',
     links: [
-      { label: 'Looks', href: '/looks' },
-      { label: 'Pricing', href: '/pricing' },
       { label: 'Resources', href: '/resources' },
+      { label: 'Insights', href: '/insights' },
+      { label: 'Partner Program', href: '/partners' },
       { label: 'Get a Demo', href: '/demo' },
-      { label: 'Sign In', href: '/auth/signin' },
-      { label: 'Client Portal', href: '/app' },
+      { label: 'Contact Us', href: '/contact' },
       { label: 'Legal', href: '/legal' },
     ],
   },
@@ -54,8 +53,8 @@ export function Footer() {
             <Image
               src="/images/brand/patientli-logo-light.svg"
               alt="Patientli"
-              width={140}
-              height={48}
+              width={120}
+              height={52}
             />
           </div>
 
@@ -99,7 +98,7 @@ export function Footer() {
             <p className="text-white/60 text-sm">
               Copyright {new Date().getFullYear()} Patientli. Made by{' '}
               <a
-                href="https://formfunction.co"
+                href="https://www.formandfunctionagency.com/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-white transition-colors"
@@ -107,14 +106,6 @@ export function Footer() {
                 Form + Function
               </a>
             </p>
-            <div className="flex items-center gap-6">
-              <Link href="/privacy-policy" className="text-white/60 text-sm hover:text-white transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/terms-of-use" className="text-white/60 text-sm hover:text-white transition-colors">
-                Terms of Use
-              </Link>
-            </div>
           </div>
         </div>
       </Container>

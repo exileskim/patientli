@@ -2,7 +2,13 @@ import Link from 'next/link';
 import { Header, Footer } from '@/components/layout';
 import { Container } from '@/components/ui';
 
-export default function CheckoutSuccessPage() {
+type CheckoutSuccessPageProps = {
+  searchParams?: Record<string, string | string[] | undefined>;
+};
+
+export default function CheckoutSuccessPage({ searchParams }: CheckoutSuccessPageProps) {
+  const isMockCheckout = searchParams?.mock === '1';
+
   return (
     <>
       <Header variant="light" />
@@ -36,6 +42,7 @@ export default function CheckoutSuccessPage() {
             <p className="text-lg text-[var(--color-text-secondary)] mb-8">
               Thank you for your subscription. Your payment was successful and your account is now active.
               We&apos;re excited to help you grow your practice!
+              {isMockCheckout ? ' (Demo checkout — Stripe is not configured yet.)' : null}
             </p>
 
             {/* Next Steps */}

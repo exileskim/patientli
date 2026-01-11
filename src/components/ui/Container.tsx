@@ -21,7 +21,7 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
         className={`
           w-full mx-auto
           ${sizeStyles[size]}
-          ${padding ? 'px-4 sm:px-6 lg:px-8' : ''}
+          ${padding ? 'px-8 md:px-12' : ''}
           ${className}
         `.trim().replace(/\s+/g, ' ')}
         {...props}

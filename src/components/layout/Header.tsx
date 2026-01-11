@@ -5,112 +5,221 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button, Container } from '@/components/ui';
 
-interface NavItem {
+interface MegaLink {
   label: string;
   href: string;
   description?: string;
-  children?: NavItem[];
+}
+
+interface MegaImageLink extends MegaLink {
+  image: string;
+  imageAlt: string;
+  width: number;
+  height: number;
+}
+
+interface MegaMenu {
+  columns: MegaLink[][];
+  featured?: MegaImageLink[];
+  aside?: {
+    headline: MegaLink;
+    sectionLabel: string;
+    thumbnails: MegaImageLink[];
+  };
+}
+
+interface NavItem {
+  label: string;
+  href: string;
+  mega?: MegaMenu;
 }
 
 const navigation: NavItem[] = [
   {
     label: 'Services',
     href: '/services',
-    children: [
-      {
-        label: 'Brand Design',
-        href: '/services/brand-design',
-        description: 'Stand out and impress patients with a modern brand.'
-      },
-      {
-        label: 'Website Design',
-        href: '/services/healthcare-website-design',
-        description: 'Custom, patient-friendly websites for dental practices.'
-      },
-      {
-        label: 'AEO',
-        href: '/services/answer-engine-optimization',
-        description: 'Healthcare AEO that can prepare you for the future of search.'
-      },
-      {
-        label: 'Search Engine Optimization',
-        href: '/services/search-engine-optimization',
-        description: 'Improve your search rankings and attract more patients.'
-      },
-      {
-        label: 'Digital Advertising',
-        href: '/services/digital-advertising-management',
-        description: 'Boost your visibility with search and social ads.'
-      },
-      {
-        label: 'Social Media Management',
-        href: '/services/social-media-management',
-        description: 'Engage and educate your patient base with social.'
-      },
-      {
-        label: 'Review Management',
-        href: '/services/review-and-reputation-management',
-        description: 'Collect and manage reviews to build trust.'
-      },
-    ],
+    mega: {
+      columns: [
+        [
+          {
+            label: 'Brand Design',
+            href: '/services/brand-design',
+            description: 'Stand out and impress patients with a modern brand.',
+          },
+          {
+            label: 'Website Design',
+            href: '/services/healthcare-website-design',
+            description: 'Custom, patient-friendly websites for dental practices.',
+          },
+          {
+            label: 'AEO',
+            href: '/services/answer-engine-optimization',
+            description: 'Healthcare AEO that can prepare you for the future of search.',
+          },
+        ],
+        [
+          {
+            label: 'Search Engine Optimization',
+            href: '/services/search-engine-optimization',
+            description: 'Improve your search rankings and attract more patients.',
+          },
+          {
+            label: 'Digital Advertising',
+            href: '/services/digital-advertising-management',
+            description: 'Boost your visibility with search and social ads.',
+          },
+        ],
+        [
+          {
+            label: 'Social Media Management',
+            href: '/services/social-media-management',
+            description: 'Engage and educate your patient base with social.',
+          },
+          {
+            label: 'Review Management',
+            href: '/services/review-and-reputation-management',
+            description: 'Collect and manage reviews to build trust.',
+          },
+        ],
+      ],
+    },
   },
   {
     label: 'Solutions',
     href: '/solutions',
-    children: [
-      {
-        label: 'Patientli for DSOs/MSOs',
-        href: '/solutions/dso-marketing-agency',
-        description: 'Scalable marketing solutions for multi-location dental groups.'
+    mega: {
+      columns: [
+        [
+          {
+            label: 'Patientli for DSOs/MSOs',
+            href: '/solutions/dso-marketing-agency',
+            description: 'Scalable marketing solutions for multi-location dental groups.',
+          },
+          {
+            label: 'Patientli for Cosmetic Dentistry',
+            href: '/solutions/cosmetic-dentistry-practices',
+            description: 'Attract and convert high-value cosmetic dental patients.',
+          },
+          {
+            label: 'Patientli for General Dentistry',
+            href: '/solutions/dental-practices',
+            description: 'Smart strategies to attract, retain, and grow your patient base.',
+          },
+          {
+            label: 'Patientli for Optometry Practices',
+            href: '/solutions/optometry-practices',
+            description: 'Proven digital marketing services built for optometry practices.',
+          },
+        ],
+        [
+          {
+            label: 'Patientli for Orthodontic Dentistry',
+            href: '/solutions/orthodontic-practices',
+            description: 'Targeted marketing to grow referrals and start more cases.',
+          },
+          {
+            label: 'Patientli for Chiropractic Practices',
+            href: '/solutions/chiropractic-practices',
+            description: 'Digital tools to boost visibility and steady patient flow.',
+          },
+          {
+            label: 'Patientli for Dermatology Practices',
+            href: '/solutions/dermatology-practices',
+            description: 'Highlight your expertise and drive more skin care bookings.',
+          },
+          {
+            label: 'Patientli for Plastic Surgery Practices',
+            href: '/solutions/plastic-surgery-practices',
+            description: 'Premium branding and lead generation that converts.',
+          },
+        ],
+      ],
+      aside: {
+        headline: {
+          label: 'Explore Patientli Looks',
+          href: '/looks',
+          description:
+            'Take a shortcut to a memorable and effective brand with a customizable Look for your practice.',
+        },
+        sectionLabel: 'Explore by Suggested Use',
+        thumbnails: [
+          {
+            label: 'General',
+            href: '/brand/general-dentistry',
+            image: '/images/looks/patientli-brand-kit-bentobox-lumena.webp',
+            imageAlt: 'Patientli Brand Kit Lumena',
+            width: 566,
+            height: 566,
+          },
+          {
+            label: 'Ortho',
+            href: '/brand/orthodontics',
+            image: '/images/looks/patientli-brand-kit-bentobox-arches.webp',
+            imageAlt: 'Patientli Brand Kit Arches',
+            width: 566,
+            height: 566,
+          },
+          {
+            label: 'Cosmetic',
+            href: '/brand/cosmetic-surgery',
+            image: '/images/looks/patientli-brand-kit-bentobox-aura-dental.webp',
+            imageAlt: 'Patientli Brand Kit Aura Dental',
+            width: 566,
+            height: 566,
+          },
+        ],
       },
-      {
-        label: 'Patientli for Cosmetic Dentistry',
-        href: '/solutions/cosmetic-dentistry-practices',
-        description: 'Attract and convert high-value cosmetic dental patients.'
-      },
-      {
-        label: 'Patientli for General Dentistry',
-        href: '/solutions/dental-practices',
-        description: 'Smart strategies to attract, retain, and grow your patient base.'
-      },
-      {
-        label: 'Patientli for Optometry Practices',
-        href: '/solutions/optometry-practices',
-        description: 'Proven digital marketing services built for optometry practices.'
-      },
-      {
-        label: 'Patientli for Orthodontic Dentistry',
-        href: '/solutions/orthodontic-practices',
-        description: 'Targeted marketing to grow referrals and start more cases.'
-      },
-      {
-        label: 'Patientli for Chiropractic Practices',
-        href: '/solutions/chiropractic-practices',
-        description: 'Digital tools to boost visibility and steady patient flow.'
-      },
-      {
-        label: 'Patientli for Dermatology Practices',
-        href: '/solutions/dermatology-practices',
-        description: 'Highlight your expertise and drive more skin care bookings.'
-      },
-      {
-        label: 'Patientli for Plastic Surgery Practices',
-        href: '/solutions/plastic-surgery-practices',
-        description: 'Premium branding and lead generation that converts.'
-      },
-    ],
-  },
-  {
-    label: 'Looks',
-    href: '/looks',
-  },
-  {
-    label: 'Pricing',
-    href: '/pricing',
+    },
   },
   {
     label: 'Resources',
     href: '/resources',
+    mega: {
+      columns: [
+        [
+          {
+            label: 'Partner Program',
+            href: '/partners',
+            description: 'Earn commissions by referring new clients.',
+          },
+          {
+            label: 'Contact Us',
+            href: '/contact',
+            description: 'Get in touch with our experts.',
+          },
+        ],
+        [
+          {
+            label: 'Free Resources',
+            href: '/resources',
+            description: 'Guides, templates, and tools to elevate your practice.',
+          },
+          {
+            label: 'Insights',
+            href: '/insights',
+            description: 'Expert marketing insights for dental practices.',
+          },
+        ],
+      ],
+      featured: [
+        {
+          label: "How do today's patients find providers?",
+          href: '/insights/how-do-todays-patients-find-providers',
+          image: '/images/resources/patientli-featured-post-how-do-patients-find-providers.webp',
+          imageAlt: 'Person on their phone with a light green radial circle in the background',
+          width: 1200,
+          height: 800,
+        },
+        {
+          label: 'How Tend Leveraged Patient Experience Design to Raise $198M',
+          href: '/insights/how-tend-leveraged-patient-experience-design-to-raise-198m',
+          image: '/images/resources/patientli-featured-post-how-tend-leverages-patient-experience-design.webp',
+          imageAlt: 'Three healthcare professionals smiling',
+          width: 1200,
+          height: 800,
+        },
+      ],
+    },
   },
 ];
 
@@ -132,33 +241,33 @@ export function Header({ variant = 'dark' }: HeaderProps) {
         transition-colors duration-300
       `}
     >
-      <Container>
-        <nav className="flex items-center justify-between h-20">
+      <Container padding={false} className="px-8 lg:px-12">
+        <nav className="flex items-center justify-between py-8 lg:py-12">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <Image
               src={isDark ? '/images/brand/patientli-logo-light.svg' : '/images/brand/patientli-logo-dark.svg'}
               alt="Patientli"
               width={120}
-              height={40}
+              height={52}
               priority
             />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-10">
             {navigation.map((item) => (
               <div
                 key={item.label}
                 className="relative"
-                onMouseEnter={() => (item.children ? setOpenDropdown(item.label) : null)}
-                onMouseLeave={() => (item.children ? setOpenDropdown(null) : null)}
+                onMouseEnter={() => (item.mega ? setOpenDropdown(item.label) : null)}
+                onMouseLeave={() => (item.mega ? setOpenDropdown(null) : null)}
               >
-                {item.children ? (
+                {item.mega ? (
                   <button
                     className={`
                       flex items-center gap-1 py-2
-                      font-medium transition-colors
+                      text-sm font-semibold transition-colors
                       ${isDark ? 'text-white hover:text-[var(--color-accent)]' : 'text-[var(--color-primary)] hover:text-[var(--color-primary-light)]'}
                     `}
                   >
@@ -177,7 +286,7 @@ export function Header({ variant = 'dark' }: HeaderProps) {
                     href={item.href}
                     className={`
                       flex items-center gap-1 py-2
-                      font-medium transition-colors
+                      text-sm font-semibold transition-colors
                       ${isDark ? 'text-white hover:text-[var(--color-accent)]' : 'text-[var(--color-primary)] hover:text-[var(--color-primary-light)]'}
                     `}
                   >
@@ -186,7 +295,7 @@ export function Header({ variant = 'dark' }: HeaderProps) {
                 )}
 
                 {/* Mega Menu Dropdown */}
-                {item.children && openDropdown === item.label && (
+                {item.mega && openDropdown === item.label && (
                   <div
                     className="absolute top-full left-0 right-0 w-screen"
                     style={{ marginLeft: 'calc(-50vw + 50%)' }}
@@ -200,28 +309,82 @@ export function Header({ variant = 'dark' }: HeaderProps) {
                     >
                       <Container>
                         <div className="grid grid-cols-3 gap-x-12 gap-y-8">
-                          {item.children.map((child) => (
-                            <Link
-                              key={child.href}
-                              href={child.href}
-                              className="block group"
-                            >
-                              <h3 className={`
-                                text-lg font-semibold mb-2
-                                ${isDark ? 'text-white' : 'text-[var(--color-primary)]'}
-                              `}>
-                                {child.label}
-                              </h3>
-                              {child.description && (
-                                <p className={`
-                                  text-sm
-                                  ${isDark ? 'text-white/70' : 'text-[var(--color-text-secondary)]'}
-                                `}>
-                                  {child.description}
-                                </p>
-                              )}
-                            </Link>
+                          {item.mega.columns.map((column, columnIndex) => (
+                            <div key={`${item.label}-col-${columnIndex}`} className="flex flex-col gap-8">
+                              {column.map((link) => (
+                                <Link key={link.href} href={link.href} className="block group">
+                                  <p className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-[var(--color-primary)]'}`}>
+                                    {link.label}
+                                  </p>
+                                  {link.description ? (
+                                    <p className={`mt-2 text-sm ${isDark ? 'text-white/70' : 'text-[var(--color-text-secondary)]'}`}>
+                                      {link.description}
+                                    </p>
+                                  ) : null}
+                                </Link>
+                              ))}
+                            </div>
                           ))}
+
+                          {item.mega.aside ? (
+                            <div className="flex flex-col gap-6">
+                              <Link href={item.mega.aside.headline.href} className="block group">
+                                <p className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-[var(--color-primary)]'}`}>
+                                  {item.mega.aside.headline.label}
+                                </p>
+                                {item.mega.aside.headline.description ? (
+                                  <p className={`mt-2 text-sm ${isDark ? 'text-white/70' : 'text-[var(--color-text-secondary)]'}`}>
+                                    {item.mega.aside.headline.description}
+                                  </p>
+                                ) : null}
+                              </Link>
+
+                              <p className={`text-sm font-semibold ${isDark ? 'text-white/80' : 'text-[var(--color-text-secondary)]'}`}>
+                                {item.mega.aside.sectionLabel}
+                              </p>
+
+                              <div className="grid grid-cols-3 gap-4">
+                                {item.mega.aside.thumbnails.map((thumb) => (
+                                  <Link key={thumb.href} href={thumb.href} className="group">
+                                    <div className="overflow-hidden rounded-2xl bg-white/5">
+                                      <Image
+                                        src={thumb.image}
+                                        alt={thumb.imageAlt}
+                                        width={thumb.width}
+                                        height={thumb.height}
+                                        className="h-auto w-full"
+                                      />
+                                    </div>
+                                    <p className={`mt-2 text-sm ${isDark ? 'text-white/80' : 'text-[var(--color-text-secondary)]'}`}>
+                                      {thumb.label}
+                                    </p>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          ) : null}
+
+                          {item.mega.featured ? (
+                            <div className="flex flex-col gap-6">
+                              {item.mega.featured.map((feature) => (
+                                <Link key={feature.href} href={feature.href} className="block group">
+                                  <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-[var(--color-primary)]'}`}>
+                                    {feature.label}
+                                  </h3>
+                                  <div className="mt-4 overflow-hidden rounded-2xl bg-white/5">
+                                    <Image
+                                      src={feature.image}
+                                      alt={feature.imageAlt}
+                                      width={feature.width}
+                                      height={feature.height}
+                                      sizes="(max-width: 1024px) 100vw, 360px"
+                                      className="h-auto w-full"
+                                    />
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
+                          ) : null}
                         </div>
                       </Container>
                     </div>
@@ -237,7 +400,7 @@ export function Header({ variant = 'dark' }: HeaderProps) {
               href="/demo"
               className={`
                 inline-flex items-center justify-center px-6 py-3
-                font-medium rounded-lg transition-colors
+                text-sm font-semibold rounded-xl transition-colors
                 ${isDark
                   ? 'bg-white text-[var(--color-primary)] hover:bg-gray-100'
                   : 'bg-[var(--color-accent)] text-[var(--color-primary)] hover:bg-[var(--color-accent-hover)]'
@@ -290,23 +453,20 @@ export function Header({ variant = 'dark' }: HeaderProps) {
                 >
                   {item.label}
                 </Link>
-                {item.children && (
+                {item.mega ? (
                   <div className="ml-4 mt-2 space-y-2">
-                    {item.children.map((child) => (
+                    {[...item.mega.columns.flat(), ...(item.mega.featured ?? []), ...(item.mega.aside?.thumbnails ?? [])].map((child) => (
                       <Link
                         key={child.href}
                         href={child.href}
-                        className={`
-                          block py-1
-                          ${isDark ? 'text-white/70' : 'text-[var(--color-text-secondary)]'}
-                        `}
+                        className={`block py-1 ${isDark ? 'text-white/70' : 'text-[var(--color-text-secondary)]'}`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {child.label}
                       </Link>
                     ))}
                   </div>
-                )}
+                ) : null}
               </div>
             ))}
             <div className="mt-6">

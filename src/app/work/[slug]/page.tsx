@@ -1,5 +1,6 @@
 import { Header, Footer } from '@/components/layout';
 import { Container, Section } from '@/components/ui';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 
@@ -275,11 +276,14 @@ export default function WorkPage({ params }: { params: { slug: string } }) {
             <Container>
               <div className="grid md:grid-cols-2 gap-8">
                 {caseStudy.images.map((image, index) => (
-                  <div key={index} className="aspect-video bg-white rounded-2xl overflow-hidden">
-                    <img
+                  <div key={index} className="relative aspect-video overflow-hidden rounded-2xl bg-white">
+                    <Image
                       src={image}
                       alt={`${caseStudy.title} - Image ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                      priority={index === 0}
                     />
                   </div>
                 ))}

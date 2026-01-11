@@ -15,6 +15,7 @@ const serverEnvSchema = z.object({
   STRIPE_BASIC_PRICE_ID: z.string().min(1).optional(),
   STRIPE_STARTER_PRICE_ID: z.string().min(1).optional(),
   STRIPE_GROWTH_PRICE_ID: z.string().min(1).optional(),
+  MOCK_CHECKOUT_ENABLED: z.enum(['0', '1']).optional(),
 
   GOOGLE_CLIENT_ID: z.string().min(1).optional(),
   GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
