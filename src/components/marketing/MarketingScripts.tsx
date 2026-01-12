@@ -784,13 +784,14 @@ async function initHubspotForms(forms: HubspotFormConfig[]) {
 
   await loadScript('https://js.hsforms.net/forms/embed/v2.js');
 
-  if (!window.hbspt?.forms?.create) return;
+  const hbspt = window.hbspt;
+  if (!hbspt?.forms?.create) return;
 
   forms.forEach((form) => {
     const target = document.querySelector<HTMLElement>(form.target);
     if (!target || target.dataset.hubspotLoaded) return;
 
-    window.hbspt.forms?.create({
+    hbspt.forms.create({
       portalId: form.portalId,
       formId: form.formId,
       target: form.target,
@@ -806,13 +807,14 @@ async function initHubspotMeetings(meetings: HubspotMeetingConfig[]) {
 
   await loadScript('https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js');
 
-  if (!window.hbspt?.meetings?.create) return;
+  const hbspt = window.hbspt;
+  if (!hbspt?.meetings?.create) return;
 
   meetings.forEach((meeting) => {
     const target = document.querySelector<HTMLElement>(meeting.selector);
     if (!target || target.dataset.hubspotMeetingLoaded) return;
 
-    window.hbspt.meetings?.create(meeting.selector);
+    hbspt.meetings.create(meeting.selector);
     target.dataset.hubspotMeetingLoaded = 'true';
   });
 }
