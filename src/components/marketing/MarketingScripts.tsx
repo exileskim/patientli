@@ -718,6 +718,8 @@ function initCarousels(root: ParentNode) {
       speed?: string | number;
       autoplay?: string;
       autoplay_speed?: string | number;
+      pause_on_hover?: string;
+      pause_on_interaction?: string;
       infinite?: string;
       image_spacing_custom?: { size?: string | number };
     };
@@ -731,7 +733,14 @@ function initCarousels(root: ParentNode) {
     const slidesToScroll = getSlidesValue(settings.slides_to_scroll as string);
     const speed = getSlidesValue(settings.speed as string) ?? 500;
     const spaceBetween = getSlidesValue(settings.image_spacing_custom?.size) ?? 0;
-    const autoplay = settings.autoplay === 'yes' ? { delay: (getSlidesValue(settings.autoplay_speed as string) ?? 5000) } : false;
+    const autoplay =
+      settings.autoplay === 'yes'
+        ? {
+            delay: getSlidesValue(settings.autoplay_speed as string) ?? 5000,
+            disableOnInteraction: settings.pause_on_interaction === 'yes',
+            pauseOnMouseEnter: settings.pause_on_hover === 'yes',
+          }
+        : false;
     const loop = settings.infinite === 'yes';
 
     const breakpoints: Record<number, { slidesPerView?: number }> = {};
@@ -824,19 +833,95 @@ async function initHubspotMeetings(meetings: HubspotMeetingConfig[]) {
 interface MarketingScriptsProps {
   hubspotForms: HubspotFormConfig[];
   hubspotMeetings: HubspotMeetingConfig[];
+  scripts: Array<{ src?: string; content?: string }>;
 }
 
 export default function MarketingScripts({
   hubspotForms,
   hubspotMeetings,
+  scripts,
 }: MarketingScriptsProps) {
   useEffect(() => {
     const root = document;
     initEnhancements(root);
     initCarouselsWithScript(root).catch(() => undefined);
-    initHubspotForms(hubspotForms).catch(() => undefined);
+    const scriptForms = extractHubspotFormsFromScripts(scripts);
+    const mergedForms = mergeHubspotForms(hubspotForms, scriptForms, root);
+    initHubspotForms(mergedForms).catch(() => undefined);
     initHubspotMeetings(hubspotMeetings).catch(() => undefined);
-  }, [hubspotForms, hubspotMeetings]);
+  }, [hubspotForms, hubspotMeetings, scripts]);
 
   return null;
+}
+
+type HubspotFormSeed = Omit<HubspotFormConfig, 'target'> & { target?: string };
+
+function extractHubspotFormsFromScripts(scripts: Array<{ content?: string }>): HubspotFormSeed[] {
+  const forms: HubspotFormSeed[] = [];
+  const formRe = /hbspt\.forms\.create\(\s*{([\s\S]*?)}\s*\)/g;
+  const fieldRe = /([a-zA-Z0-9_]+)\s*:\s*["']([^"']+)["']/g;
+  scripts.forEach((script) => {
+    if (!script.content) return;
+    formRe.lastIndex = 0;
+    let match;
+    while ((match = formRe.exec(script.content))) {
+      const configText = match[1] ?? '';
+      const form: HubspotFormSeed = { portalId: '', formId: '' };
+      fieldRe.lastIndex = 0;
+      let fieldMatch;
+      while ((fieldMatch = fieldRe.exec(configText))) {
+        const key = fieldMatch[1];
+        const value = fieldMatch[2];
+        if (key === 'portalId') form.portalId = value;
+        if (key === 'formId') form.formId = value;
+        if (key === 'region') form.region = value;
+        if (key === 'target') form.target = value;
+      }
+      if (form.portalId && form.formId) {
+        forms.push(form);
+      }
+    }
+  });
+  return forms;
+}
+
+function mergeHubspotForms(
+  explicitForms: HubspotFormConfig[],
+  scriptForms: HubspotFormSeed[],
+  root: ParentNode,
+): HubspotFormConfig[] {
+  if (!scriptForms.length) return explicitForms;
+  const emptyTargets = findEmptyHtmlWidgets(root);
+  const merged = [...explicitForms];
+
+  scriptForms.forEach((form, index) => {
+    const target = form.target ?? emptyTargets[index];
+    if (!target) return;
+    merged.push({
+      portalId: form.portalId,
+      formId: form.formId,
+      region: form.region,
+      target,
+    });
+  });
+
+  return merged;
+}
+
+function findEmptyHtmlWidgets(root: ParentNode): string[] {
+  const containers = Array.from(
+    root.querySelectorAll<HTMLElement>('.elementor-widget-html .elementor-widget-container'),
+  ).filter((container) => {
+    if (container.dataset.hubspotTarget) return false;
+    if (container.childElementCount > 0) return false;
+    return (container.textContent ?? '').trim().length === 0;
+  });
+
+  return containers.map((container, index) => {
+    const widgetId = container.closest<HTMLElement>('[data-id]')?.getAttribute('data-id');
+    const id = container.id || `hubspot-form-${widgetId ?? index + 1}`;
+    container.id = id;
+    container.dataset.hubspotTarget = 'true';
+    return `#${id}`;
+  });
 }

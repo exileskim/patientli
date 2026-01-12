@@ -53,7 +53,11 @@ export default async function MarketingPage({ params }: MarketingPageProps) {
       {headerHtml ? <div dangerouslySetInnerHTML={{ __html: headerHtml }} /> : null}
       <div dangerouslySetInnerHTML={{ __html: entry.html }} />
       {footerHtml ? <div dangerouslySetInnerHTML={{ __html: footerHtml }} /> : null}
-      <MarketingScripts hubspotForms={entry.hubspotForms} hubspotMeetings={entry.hubspotMeetings} />
+      <MarketingScripts
+        hubspotForms={entry.hubspotForms}
+        hubspotMeetings={entry.hubspotMeetings}
+        scripts={entry.scripts}
+      />
     </>
   );
 }
