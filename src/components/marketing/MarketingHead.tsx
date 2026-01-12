@@ -4,17 +4,10 @@ import { useEffect, useMemo } from 'react';
 import { useServerInsertedHTML } from 'next/navigation';
 
 const baseStyles = [
-  '/marketing/inline.css',
+  '/marketing/marketing.css',
   'https://use.typekit.net/tam7fax.css',
-  '/wp-content/uploads/elementor/google-fonts/css/playfairdisplay.css',
-  '/wp-content/uploads/elementor/google-fonts/css/outfit.css',
-  '/wp-content/plugins/elementor/assets/css/conditionals/dialog.min.css',
-  '/wp-content/plugins/elementor/assets/css/conditionals/lightbox.min.css',
 ];
-const SMALLSCREEN_MEDIA = 'only screen and (max-width: 768px)';
-const styleMediaMap = new Map<string, string>([
-  ['/wp-content/plugins/woocommerce/assets/css/woocommerce-smallscreen.css', SMALLSCREEN_MEDIA],
-]);
+const BLOCKED_STYLE_RE = /\/wp-content\//;
 
 interface MarketingHeadProps {
   path: string;
@@ -24,7 +17,8 @@ interface MarketingHeadProps {
 
 function buildStyleList(styles: string[]) {
   const seen = new Set<string>();
-  return [...baseStyles, ...styles].filter((href) => {
+  const filtered = styles.filter((href) => !BLOCKED_STYLE_RE.test(href));
+  return [...baseStyles, ...filtered].filter((href) => {
     if (!href) return false;
     if (seen.has(href)) return false;
     seen.add(href);
@@ -32,10 +26,7 @@ function buildStyleList(styles: string[]) {
   });
 }
 
-function getStyleMedia(href: string) {
-  for (const [match, media] of styleMediaMap.entries()) {
-    if (href.includes(match)) return media;
-  }
+function getStyleMedia(_href?: string) {
   return undefined;
 }
 

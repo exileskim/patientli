@@ -773,7 +773,7 @@ async function initCarouselsWithScript(root: ParentNode) {
   if (!hasSwiper) return;
 
   if (!window.Swiper) {
-    await loadScript('/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js');
+    await loadScript('/marketing/assets/plugins/elementor/assets/lib/swiper/v8/swiper.min.js');
   }
 
   initCarousels(root);
