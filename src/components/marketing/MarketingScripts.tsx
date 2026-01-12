@@ -699,7 +699,8 @@ function getSlidesValue(value?: string | number) {
 }
 
 function initCarousels(root: ParentNode) {
-  if (!window.Swiper) return;
+  const Swiper = window.Swiper;
+  if (!Swiper) return;
 
   const widgets = root.querySelectorAll<HTMLElement>(
     '.elementor-widget-n-carousel, .elementor-widget-loop-carousel',
@@ -741,7 +742,7 @@ function initCarousels(root: ParentNode) {
     const prev = widget.querySelector<HTMLElement>('.elementor-swiper-button-prev');
     const next = widget.querySelector<HTMLElement>('.elementor-swiper-button-next');
 
-    new window.Swiper(swiperEl, {
+    new Swiper(swiperEl, {
       slidesPerView: slidesToShow ?? 1,
       slidesPerGroup: slidesToScroll ?? 1,
       speed,
