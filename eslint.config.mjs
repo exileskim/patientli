@@ -21,6 +21,7 @@ const eslintConfig = defineConfig([
     "Planning/**",
     "scripts/**",
     "prisma/migrations/**",
+    "public/**",
   ]),
 ]);
 

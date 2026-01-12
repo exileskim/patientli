@@ -1,17 +1,21 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
-import { WpBodyClass, WpFooter, WpHeader, WpHeadTags } from '@/components/wp';
-import { getWpEntry, getWpFile, getWpHtml, normalizeWpPath } from '@/lib/wp-content';
-import { stripWpBodyHtml } from '@/lib/wp-sanitize';
+import MarketingBodyClass from '@/components/marketing/MarketingBodyClass';
+import MarketingHead from '@/components/marketing/MarketingHead';
+import MarketingScripts from '@/components/marketing/MarketingScripts';
+import { getMarketingPage, getMarketingPartial, normalizeMarketingPath } from '@/lib/marketing-content';
+
+type MarketingPageParams = { slug?: string[] };
 
 interface MarketingPageProps {
-  params: { slug?: string[] };
+  params: Promise<MarketingPageParams> | MarketingPageParams;
 }
 
 export async function generateMetadata({ params }: MarketingPageProps): Promise<Metadata> {
-  const pathname = normalizeWpPath(`/${params.slug?.join('/') ?? ''}`);
-  const entry = getWpEntry(pathname);
+  const { slug } = await Promise.resolve(params);
+  const pathname = normalizeMarketingPath(`/${slug?.join('/') ?? ''}`);
+  const entry = getMarketingPage(pathname);
 
   if (!entry) {
     return {};
@@ -20,30 +24,36 @@ export async function generateMetadata({ params }: MarketingPageProps): Promise<
   return {
     title: entry.title || 'Patientli',
     description: entry.description || undefined,
+    openGraph: {
+      title: entry.title || 'Patientli',
+      description: entry.description || undefined,
+      url: `https://www.patient.li${pathname}`,
+      siteName: 'Patientli',
+      type: 'website',
+    },
   };
 }
 
-export default function MarketingPage({ params }: MarketingPageProps) {
-  const pathname = normalizeWpPath(`/${params.slug?.join('/') ?? ''}`);
-  const entry = getWpEntry(pathname);
+export default async function MarketingPage({ params }: MarketingPageProps) {
+  const { slug } = await Promise.resolve(params);
+  const pathname = normalizeMarketingPath(`/${slug?.join('/') ?? ''}`);
+  const entry = getMarketingPage(pathname);
 
   if (!entry) {
     notFound();
   }
 
-  const html = getWpHtml(entry);
-  const beforeHtml = entry.beforePath ? stripWpBodyHtml(getWpFile(entry.beforePath)) : '';
-  const afterHtml = entry.afterPath ? stripWpBodyHtml(getWpFile(entry.afterPath)) : '';
+  const headerHtml = entry.header ? getMarketingPartial(entry.header) : '';
+  const footerHtml = entry.footer ? getMarketingPartial(entry.footer) : '';
 
   return (
     <>
-      <WpBodyClass className={entry.bodyClass} />
-      <WpHeadTags headTags={entry.headTags} />
-      {beforeHtml ? <div dangerouslySetInnerHTML={{ __html: beforeHtml }} /> : null}
-      <WpHeader htmlPath={entry.headerPath} />
-      <div dangerouslySetInnerHTML={{ __html: html }} />
-      <WpFooter htmlPath={entry.footerPath} />
-      {afterHtml ? <div dangerouslySetInnerHTML={{ __html: afterHtml }} /> : null}
+      <MarketingHead path={entry.path} styles={entry.css} structuredData={entry.structuredData} />
+      <MarketingBodyClass className={entry.bodyClass} />
+      {headerHtml ? <div dangerouslySetInnerHTML={{ __html: headerHtml }} /> : null}
+      <div dangerouslySetInnerHTML={{ __html: entry.html }} />
+      {footerHtml ? <div dangerouslySetInnerHTML={{ __html: footerHtml }} /> : null}
+      <MarketingScripts hubspotForms={entry.hubspotForms} hubspotMeetings={entry.hubspotMeetings} />
     </>
   );
 }

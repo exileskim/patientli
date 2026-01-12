@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Outfit } from "next/font/google";
 import "./globals.css";
+
+import { getMarketingPage, normalizeMarketingPath } from "@/lib/marketing-content";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -21,14 +24,33 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerList = await headers();
+  const nextUrl =
+    headerList.get("x-pathname") ||
+    headerList.get("next-url") ||
+    headerList.get("x-nextjs-rewritten-path") ||
+    headerList.get("x-matched-path") ||
+    "/";
+  const pathname = normalizeMarketingPath(new URL(nextUrl, "http://localhost").pathname);
+  const marketingEntry = getMarketingPage(pathname);
+  const marketingClass = marketingEntry?.bodyClass ?? "";
+  const bodyClass = [
+    outfit.variable,
+    "antialiased",
+    marketingEntry ? "marketing-site" : "",
+    marketingClass,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <html lang="en">
-      <body className={`${outfit.variable} antialiased`}>
+      <body className={bodyClass}>
         {children}
       </body>
     </html>

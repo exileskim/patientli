@@ -7,6 +7,11 @@ const OUTPUT_DIR = path.join(process.cwd(), 'src/content/wp');
 const MANIFEST_PATH = path.join(OUTPUT_DIR, 'manifest.json');
 const HEADERS_DIR = path.join(OUTPUT_DIR, 'headers');
 const FOOTERS_DIR = path.join(OUTPUT_DIR, 'footers');
+const EXTRA_PATHS = [
+  '/insights/page/2/',
+  '/insights/page/3/',
+  '/insights/page/4/',
+];
 
 async function fetchText(url) {
   const res = await fetch(url);
@@ -229,6 +234,11 @@ async function main() {
     const xml = await fetchText(sitemapUrl);
     pageUrls.push(...extractLocs(xml));
   }
+  for (const extraPath of EXTRA_PATHS) {
+    pageUrls.push(`${ROOT}${extraPath}`);
+  }
+
+  const uniquePageUrls = Array.from(new Set(pageUrls));
 
   const manifest = {
     generatedAt: new Date().toISOString(),
@@ -237,7 +247,7 @@ async function main() {
   const headerCache = new Set();
   const footerCache = new Set();
 
-  for (const url of pageUrls) {
+  for (const url of uniquePageUrls) {
     const html = await fetchText(url);
     const {
       beforeHeader,
