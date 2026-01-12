@@ -5,6 +5,7 @@ import { useServerInsertedHTML } from 'next/navigation';
 
 const baseStyles = [
   '/marketing/marketing.css',
+  '/marketing/assets/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css',
   'https://use.typekit.net/tam7fax.css',
 ];
 const BLOCKED_STYLE_RE = /\/wp-content\//;
