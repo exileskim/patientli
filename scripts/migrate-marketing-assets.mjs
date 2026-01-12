@@ -14,6 +14,7 @@ const COMBINED_CSS_PATH = path.join(MARKETING_DIR, 'marketing.css');
 
 const ASSET_PREFIX = '/marketing/assets';
 const WP_URL_RE = /(?:https?:\/\/www\.patient\.li|\/\/www\.patient\.li)?(\/wp-content\/[^\t\n\r "'\\\)>,]+)/g;
+const WP_PATH_RE = /(\/wp-content\/[^\t\n\r "'\\)>,]+)/;
 const CSS_URL_RE = /url\(([^)]+)\)/gi;
 
 const BASE_CSS_PATHS = [
@@ -47,7 +48,7 @@ async function resolveSourcePath(urlPath) {
 
 function normalizeWpPath(value) {
   if (!value) return null;
-  const match = value.match(/(\/wp-content\/[^\s"')>]+)/);
+  const match = value.match(WP_PATH_RE);
   return match ? match[1] : null;
 }
 
