@@ -7,8 +7,10 @@ import { Header, Footer } from '@/components/layout';
 import { Button, Container } from '@/components/ui';
 import looksData from '@/content/looks.json';
 import { base64urlDecodeToString, base64urlEncodeString } from '@/lib/base64url';
+import type { LookContentOverridesV1 } from '@/modules/looks/domain/content.schema';
 import { lookConfigDocumentSchemaV1 } from '@/modules/looks/domain/config.schema';
 import type { LookTokenOverridesV1, LookTokensV1 } from '@/modules/looks/domain/tokens.schema';
+import { getDefaultLookContent, mergeLookContentV1 } from '@/modules/looks/ui/content';
 import { cssVarsFromLookTokensV1, mergeLookTokensV1 } from '@/modules/looks/ui/tokens';
 
 // Preview tab types
@@ -97,7 +99,14 @@ export default function LookDetailPage({ params }: PageProps) {
 
   const [practiceName, setPracticeName] = useState('Forestville Family Dentistry');
   const [practicePhone, setPracticePhone] = useState('(555) 555-5555');
+  const [practiceAddress1, setPracticeAddress1] = useState('123 Main Street');
+  const [practiceAddress2, setPracticeAddress2] = useState('');
+  const [practiceCity, setPracticeCity] = useState('Forestville');
+  const [practiceState, setPracticeState] = useState('CA');
+  const [practiceZip, setPracticeZip] = useState('95436');
+  const [practiceLogoUrl, setPracticeLogoUrl] = useState('');
   const [tokenOverrides, setTokenOverrides] = useState<LookTokenOverridesV1>({});
+  const [contentOverrides, setContentOverrides] = useState<LookContentOverridesV1>({});
   const [shareMessage, setShareMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -134,6 +143,16 @@ export default function LookDetailPage({ params }: PageProps) {
     [baseTokens, tokenOverrides]
   );
 
+  const baseContent = useMemo(
+    () => getDefaultLookContent({ practiceName }),
+    [practiceName]
+  );
+
+  const mergedContent = useMemo(
+    () => mergeLookContentV1(baseContent, contentOverrides),
+    [baseContent, contentOverrides]
+  );
+
   const previewStyle = useMemo(
     () => cssVarsFromLookTokensV1(mergedTokens),
     [mergedTokens]
@@ -143,8 +162,23 @@ export default function LookDetailPage({ params }: PageProps) {
     () => ({
       name: practiceName.trim(),
       phone: practicePhone.trim() || undefined,
+      address1: practiceAddress1.trim() || undefined,
+      address2: practiceAddress2.trim() || undefined,
+      city: practiceCity.trim() || undefined,
+      state: practiceState.trim() || undefined,
+      zip: practiceZip.trim() || undefined,
+      logoUrl: practiceLogoUrl.trim() || undefined,
     }),
-    [practiceName, practicePhone]
+    [
+      practiceAddress1,
+      practiceAddress2,
+      practiceCity,
+      practiceLogoUrl,
+      practiceName,
+      practicePhone,
+      practiceState,
+      practiceZip,
+    ]
   );
 
   const domainLabel = useMemo(() => {
@@ -154,6 +188,33 @@ export default function LookDetailPage({ params }: PageProps) {
       .slice(0, 32);
     return `${slugified || 'yourpractice'}.com`;
   }, [practice.name]);
+
+  const locationLine = useMemo(() => {
+    const line1 = [practiceAddress1.trim(), practiceAddress2.trim()].filter(Boolean).join(' ');
+    const line2 = [practiceCity.trim(), practiceState.trim(), practiceZip.trim()]
+      .filter(Boolean)
+      .join(' ');
+    return [line1, line2].filter(Boolean).join(', ');
+  }, [practiceAddress1, practiceAddress2, practiceCity, practiceState, practiceZip]);
+
+  const contactLine = useMemo(() => {
+    const phone = practicePhone.trim();
+    return [locationLine, phone].filter(Boolean).join(' • ');
+  }, [locationLine, practicePhone]);
+
+  const phoneLabel = useMemo(
+    () => practicePhone.trim() || '(555) 555-5555',
+    [practicePhone]
+  );
+
+  const logoInitials = useMemo(() => {
+    const parts = practiceName.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return 'PL';
+    return parts
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('');
+  }, [practiceName]);
 
   useEffect(() => {
     const encoded = searchParams.get('c');
@@ -176,7 +237,14 @@ export default function LookDetailPage({ params }: PageProps) {
           if (cancelled) return;
           setPracticeName(doc.practice.name);
           setPracticePhone(doc.practice.phone ?? '');
+          setPracticeAddress1(doc.practice.address1 ?? '');
+          setPracticeAddress2(doc.practice.address2 ?? '');
+          setPracticeCity(doc.practice.city ?? '');
+          setPracticeState(doc.practice.state ?? '');
+          setPracticeZip(doc.practice.zip ?? '');
+          setPracticeLogoUrl(doc.practice.logoUrl ?? '');
           setTokenOverrides(doc.tokenOverrides ?? {});
+          setContentOverrides(doc.contentOverrides ?? {});
           return;
         }
 
@@ -192,7 +260,14 @@ export default function LookDetailPage({ params }: PageProps) {
           if (cancelled) return;
           setPracticeName(doc.practice.name);
           setPracticePhone(doc.practice.phone ?? '');
+          setPracticeAddress1(doc.practice.address1 ?? '');
+          setPracticeAddress2(doc.practice.address2 ?? '');
+          setPracticeCity(doc.practice.city ?? '');
+          setPracticeState(doc.practice.state ?? '');
+          setPracticeZip(doc.practice.zip ?? '');
+          setPracticeLogoUrl(doc.practice.logoUrl ?? '');
           setTokenOverrides(doc.tokenOverrides ?? {});
+          setContentOverrides(doc.contentOverrides ?? {});
         }
       } catch {
         // ignore
@@ -222,6 +297,7 @@ export default function LookDetailPage({ params }: PageProps) {
           industry: 'dental',
           practice,
           tokenOverrides,
+          contentOverrides,
         },
       }),
     });
@@ -245,6 +321,7 @@ export default function LookDetailPage({ params }: PageProps) {
       industry: 'dental' as const,
       practice,
       tokenOverrides,
+      contentOverrides,
     };
 
     const encoded = base64urlEncodeString(JSON.stringify(configDocument));
@@ -270,6 +347,83 @@ export default function LookDetailPage({ params }: PageProps) {
     } finally {
       setIsSaving(false);
     }
+  }
+
+  function updateHeroField(
+    key: 'headline' | 'subhead' | 'ctaLabel',
+    value: string
+  ) {
+    setContentOverrides((prev) => {
+      const nextHero = { ...(prev.hero ?? {}) } as Record<string, string>;
+      if (!value.trim()) {
+        delete nextHero[key];
+      } else {
+        nextHero[key] = value;
+      }
+      if (Object.keys(nextHero).length === 0) {
+        const { hero, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, hero: nextHero };
+    });
+  }
+
+  function updateFooterField(
+    key: 'headline' | 'body' | 'ctaLabel',
+    value: string
+  ) {
+    setContentOverrides((prev) => {
+      const nextFooter = { ...(prev.footerCta ?? {}) } as Record<string, string>;
+      if (!value.trim()) {
+        delete nextFooter[key];
+      } else {
+        nextFooter[key] = value;
+      }
+      if (Object.keys(nextFooter).length === 0) {
+        const { footerCta, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, footerCta: nextFooter };
+    });
+  }
+
+  function updateAbout(value: string) {
+    setContentOverrides((prev) => {
+      if (!value.trim()) {
+        const { about, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, about: value };
+    });
+  }
+
+  function parseLines(value: string) {
+    return value
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }
+
+  function updateHighlights(value: string) {
+    const lines = parseLines(value);
+    setContentOverrides((prev) => {
+      if (lines.length === 0) {
+        const { highlights, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, highlights: lines };
+    });
+  }
+
+  function updateServices(value: string) {
+    const lines = parseLines(value);
+    setContentOverrides((prev) => {
+      if (lines.length === 0) {
+        const { services, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, services: lines };
+    });
   }
 
   if (!look) {
@@ -373,6 +527,80 @@ export default function LookDetailPage({ params }: PageProps) {
                         placeholder="(555) 555-5555"
                       />
                     </div>
+                    <div>
+                      <label htmlFor="practiceAddress1" className="block text-sm font-medium mb-1">
+                        Address line 1
+                      </label>
+                      <input
+                        id="practiceAddress1"
+                        value={practiceAddress1}
+                        onChange={(e) => setPracticeAddress1(e.target.value)}
+                        className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                        placeholder="123 Main Street"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="practiceAddress2" className="block text-sm font-medium mb-1">
+                        Address line 2 (optional)
+                      </label>
+                      <input
+                        id="practiceAddress2"
+                        value={practiceAddress2}
+                        onChange={(e) => setPracticeAddress2(e.target.value)}
+                        className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                        placeholder="Suite 200"
+                      />
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div>
+                        <label htmlFor="practiceCity" className="block text-sm font-medium mb-1">
+                          City
+                        </label>
+                        <input
+                          id="practiceCity"
+                          value={practiceCity}
+                          onChange={(e) => setPracticeCity(e.target.value)}
+                          className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                          placeholder="Forestville"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="practiceState" className="block text-sm font-medium mb-1">
+                          State
+                        </label>
+                        <input
+                          id="practiceState"
+                          value={practiceState}
+                          onChange={(e) => setPracticeState(e.target.value)}
+                          className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                          placeholder="CA"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="practiceZip" className="block text-sm font-medium mb-1">
+                        ZIP
+                      </label>
+                      <input
+                        id="practiceZip"
+                        value={practiceZip}
+                        onChange={(e) => setPracticeZip(e.target.value)}
+                        className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                        placeholder="95436"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="practiceLogoUrl" className="block text-sm font-medium mb-1">
+                        Logo URL (optional)
+                      </label>
+                      <input
+                        id="practiceLogoUrl"
+                        value={practiceLogoUrl}
+                        onChange={(e) => setPracticeLogoUrl(e.target.value)}
+                        className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                        placeholder="https://..."
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -424,6 +652,121 @@ export default function LookDetailPage({ params }: PageProps) {
                             {pair.label}
                           </button>
                         ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h2 className="text-sm font-medium mb-3 text-[var(--color-text-muted)]">Content</h2>
+                  <div className="space-y-3">
+                    <div>
+                      <label htmlFor="heroHeadline" className="block text-sm font-medium mb-1">
+                        Hero headline
+                      </label>
+                      <input
+                        id="heroHeadline"
+                        value={mergedContent.hero.headline}
+                        onChange={(e) => updateHeroField('headline', e.target.value)}
+                        className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="heroSubhead" className="block text-sm font-medium mb-1">
+                        Hero subhead
+                      </label>
+                      <textarea
+                        id="heroSubhead"
+                        value={mergedContent.hero.subhead}
+                        onChange={(e) => updateHeroField('subhead', e.target.value)}
+                        rows={3}
+                        className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="heroCta" className="block text-sm font-medium mb-1">
+                        Hero button label
+                      </label>
+                      <input
+                        id="heroCta"
+                        value={mergedContent.hero.ctaLabel}
+                        onChange={(e) => updateHeroField('ctaLabel', e.target.value)}
+                        className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="highlights" className="block text-sm font-medium mb-1">
+                        Highlights (one per line)
+                      </label>
+                      <textarea
+                        id="highlights"
+                        value={mergedContent.highlights.join('\n')}
+                        onChange={(e) => updateHighlights(e.target.value)}
+                        rows={3}
+                        className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="services" className="block text-sm font-medium mb-1">
+                        Services (one per line)
+                      </label>
+                      <textarea
+                        id="services"
+                        value={mergedContent.services.join('\n')}
+                        onChange={(e) => updateServices(e.target.value)}
+                        rows={3}
+                        className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="aboutCopy" className="block text-sm font-medium mb-1">
+                        About copy
+                      </label>
+                      <textarea
+                        id="aboutCopy"
+                        value={mergedContent.about}
+                        onChange={(e) => updateAbout(e.target.value)}
+                        rows={3}
+                        className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                      />
+                    </div>
+                    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-cream)] p-3 space-y-2">
+                      <div className="text-xs uppercase tracking-wider text-[var(--color-text-muted)]">
+                        Footer call to action
+                      </div>
+                      <div>
+                        <label htmlFor="footerHeadline" className="block text-sm font-medium mb-1">
+                          Headline
+                        </label>
+                        <input
+                          id="footerHeadline"
+                          value={mergedContent.footerCta.headline}
+                          onChange={(e) => updateFooterField('headline', e.target.value)}
+                          className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="footerBody" className="block text-sm font-medium mb-1">
+                          Body
+                        </label>
+                        <textarea
+                          id="footerBody"
+                          value={mergedContent.footerCta.body}
+                          onChange={(e) => updateFooterField('body', e.target.value)}
+                          rows={2}
+                          className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="footerCtaLabel" className="block text-sm font-medium mb-1">
+                          Button label
+                        </label>
+                        <input
+                          id="footerCtaLabel"
+                          value={mergedContent.footerCta.ctaLabel}
+                          onChange={(e) => updateFooterField('ctaLabel', e.target.value)}
+                          className="w-full px-3 py-2 border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                        />
                       </div>
                     </div>
                   </div>
@@ -494,7 +837,20 @@ export default function LookDetailPage({ params }: PageProps) {
                         <div className="absolute inset-0 p-8">
                           {/* Nav */}
                           <div className="flex justify-between items-center mb-16">
-                            <span className="text-white font-heading text-xl">{practice.name}</span>
+                            <div className="flex items-center gap-3">
+                              {practiceLogoUrl.trim() ? (
+                                <img
+                                  src={practiceLogoUrl.trim()}
+                                  alt={`${practice.name} logo`}
+                                  className="h-8 w-8 rounded-full object-cover border border-white/20 bg-white/10"
+                                />
+                              ) : (
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[10px] font-medium text-white">
+                                  {logoInitials}
+                                </div>
+                              )}
+                              <span className="text-white font-heading text-xl">{practice.name}</span>
+                            </div>
                             <div className="flex gap-4 text-white/60 text-sm">
                               <span>Services</span>
                               <span>About</span>
@@ -506,17 +862,17 @@ export default function LookDetailPage({ params }: PageProps) {
                             <div>
                               <p className="text-white/60 text-xs uppercase tracking-wider mb-2">Healthcare</p>
                               <h2 className="text-white text-2xl font-heading mb-4">
-                                Beautiful smiles start here.
+                                {mergedContent.hero.headline}
                               </h2>
                               <p className="text-white/70 text-sm mb-6">
-                                We blend the latest technology with personalized care.
+                                {mergedContent.hero.subhead}
                               </p>
                               <div className="flex gap-3">
                                 <span className="px-4 py-2 bg-white text-[var(--color-primary)] text-xs rounded-full">
-                                  Book Now
+                                  {mergedContent.hero.ctaLabel}
                                 </span>
                                 <span className="px-4 py-2 border border-white/30 text-white text-xs rounded-full">
-                                  Learn More
+                                  Call {phoneLabel}
                                 </span>
                               </div>
                             </div>
@@ -530,16 +886,21 @@ export default function LookDetailPage({ params }: PageProps) {
                       <div className="p-8 space-y-8">
                         <div className="text-center">
                           <h3 className="text-xl font-heading text-[var(--color-primary)] mb-2">
-                            Modern care for modern patients.
+                            About {practice.name}
                           </h3>
                           <p className="text-sm text-[var(--color-text-muted)]">
-                            Experience the difference with our comprehensive approach.
+                            {mergedContent.about}
                           </p>
                         </div>
                         <div className="grid grid-cols-3 gap-4">
-                          <div className="aspect-square bg-[var(--color-bg-mint)] rounded-xl" />
-                          <div className="aspect-square bg-[var(--color-bg-cream)] rounded-xl" />
-                          <div className="aspect-square bg-[var(--color-bg-peach)] rounded-xl" />
+                          {mergedContent.services.slice(0, 3).map((service) => (
+                            <div
+                              key={service}
+                              className="flex items-center justify-center rounded-xl bg-[var(--color-bg-cream)] text-xs text-[var(--color-text-secondary)] px-2 text-center"
+                            >
+                              {service}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -561,13 +922,13 @@ export default function LookDetailPage({ params }: PageProps) {
                           <div className="mt-12">
                             <p className="text-white/60 text-xs uppercase tracking-wider mb-2">Healthcare</p>
                             <h2 className="text-white text-lg font-heading mb-3">
-                              Beautiful smiles start here.
+                              {mergedContent.hero.headline}
                             </h2>
                             <p className="text-white/70 text-xs mb-4">
-                              We blend the latest technology with personalized care.
+                              {mergedContent.hero.subhead}
                             </p>
                             <span className="inline-block px-4 py-2 bg-white text-[var(--color-primary)] text-xs rounded-full">
-                              Book Now
+                              {mergedContent.hero.ctaLabel}
                             </span>
                           </div>
                         </div>

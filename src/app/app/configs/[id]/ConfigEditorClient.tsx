@@ -3,8 +3,10 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 
+import type { LookContentOverridesV1 } from '@/modules/looks/domain/content.schema';
 import type { LookConfigDocumentV1 } from '@/modules/looks/domain/config.schema';
 import type { LookTokenOverridesV1, LookTokensV1 } from '@/modules/looks/domain/tokens.schema';
+import { getDefaultLookContent, mergeLookContentV1 } from '@/modules/looks/ui/content';
 import { cssVarsFromLookTokensV1, mergeLookTokensV1 } from '@/modules/looks/ui/tokens';
 
 type RevisionListItem = { id: string; revision: number; createdAt: string };
@@ -46,8 +48,17 @@ export function ConfigEditorClient(props: {
 
   const [practiceName, setPracticeName] = useState(initialConfig.practice.name);
   const [practicePhone, setPracticePhone] = useState(initialConfig.practice.phone ?? '');
+  const [practiceAddress1, setPracticeAddress1] = useState(initialConfig.practice.address1 ?? '');
+  const [practiceAddress2, setPracticeAddress2] = useState(initialConfig.practice.address2 ?? '');
+  const [practiceCity, setPracticeCity] = useState(initialConfig.practice.city ?? '');
+  const [practiceState, setPracticeState] = useState(initialConfig.practice.state ?? '');
+  const [practiceZip, setPracticeZip] = useState(initialConfig.practice.zip ?? '');
+  const [practiceLogoUrl, setPracticeLogoUrl] = useState(initialConfig.practice.logoUrl ?? '');
   const [tokenOverrides, setTokenOverrides] = useState<LookTokenOverridesV1>(
     initialConfig.tokenOverrides ?? {}
+  );
+  const [contentOverrides, setContentOverrides] = useState<LookContentOverridesV1>(
+    initialConfig.contentOverrides ?? {}
   );
   const [revisions, setRevisions] = useState<RevisionListItem[]>(props.revisions);
 
@@ -59,6 +70,16 @@ export function ConfigEditorClient(props: {
     [baseTokens, tokenOverrides]
   );
 
+  const baseContent = useMemo(
+    () => getDefaultLookContent({ practiceName }),
+    [practiceName]
+  );
+
+  const mergedContent = useMemo(
+    () => mergeLookContentV1(baseContent, contentOverrides),
+    [baseContent, contentOverrides]
+  );
+
   const previewStyle = useMemo(() => cssVarsFromLookTokensV1(mergedTokens), [mergedTokens]);
 
   const configDocument = useMemo<LookConfigDocumentV1>(
@@ -67,15 +88,63 @@ export function ConfigEditorClient(props: {
       lookSlug,
       lookVersion,
       industry: 'dental',
+      contentOverrides,
       practice: {
         ...initialConfig.practice,
         name: practiceName.trim(),
         phone: practicePhone.trim() || undefined,
+        address1: practiceAddress1.trim() || undefined,
+        address2: practiceAddress2.trim() || undefined,
+        city: practiceCity.trim() || undefined,
+        state: practiceState.trim() || undefined,
+        zip: practiceZip.trim() || undefined,
+        logoUrl: practiceLogoUrl.trim() || undefined,
       },
       tokenOverrides,
     }),
-    [initialConfig.practice, lookSlug, lookVersion, practiceName, practicePhone, tokenOverrides]
+    [
+      contentOverrides,
+      initialConfig.practice,
+      lookSlug,
+      lookVersion,
+      practiceAddress1,
+      practiceAddress2,
+      practiceCity,
+      practiceLogoUrl,
+      practiceName,
+      practicePhone,
+      practiceState,
+      practiceZip,
+      tokenOverrides,
+    ]
   );
+
+  const locationLine = useMemo(() => {
+    const line1 = [practiceAddress1.trim(), practiceAddress2.trim()].filter(Boolean).join(' ');
+    const line2 = [practiceCity.trim(), practiceState.trim(), practiceZip.trim()]
+      .filter(Boolean)
+      .join(' ');
+    return [line1, line2].filter(Boolean).join(', ');
+  }, [practiceAddress1, practiceAddress2, practiceCity, practiceState, practiceZip]);
+
+  const contactLine = useMemo(() => {
+    const phone = practicePhone.trim();
+    return [locationLine, phone].filter(Boolean).join(' • ');
+  }, [locationLine, practicePhone]);
+
+  const phoneLabel = useMemo(
+    () => practicePhone.trim() || '(555) 555-5555',
+    [practicePhone]
+  );
+
+  const logoInitials = useMemo(() => {
+    const parts = practiceName.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return 'PL';
+    return parts
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('');
+  }, [practiceName]);
 
   async function handleCopyPreviewLink() {
     setStatusMessage(null);
@@ -134,7 +203,14 @@ export function ConfigEditorClient(props: {
         setPracticeName(json.config.practice.name);
       }
       setPracticePhone(json.config?.practice?.phone ?? '');
+      setPracticeAddress1(json.config?.practice?.address1 ?? '');
+      setPracticeAddress2(json.config?.practice?.address2 ?? '');
+      setPracticeCity(json.config?.practice?.city ?? '');
+      setPracticeState(json.config?.practice?.state ?? '');
+      setPracticeZip(json.config?.practice?.zip ?? '');
+      setPracticeLogoUrl(json.config?.practice?.logoUrl ?? '');
       setTokenOverrides(json.config?.tokenOverrides ?? {});
+      setContentOverrides(json.config?.contentOverrides ?? {});
 
       const item: RevisionListItem = {
         id: json.revision.id,
@@ -148,6 +224,83 @@ export function ConfigEditorClient(props: {
     } finally {
       setIsSaving(false);
     }
+  }
+
+  function updateHeroField(
+    key: 'headline' | 'subhead' | 'ctaLabel',
+    value: string
+  ) {
+    setContentOverrides((prev) => {
+      const nextHero = { ...(prev.hero ?? {}) } as Record<string, string>;
+      if (!value.trim()) {
+        delete nextHero[key];
+      } else {
+        nextHero[key] = value;
+      }
+      if (Object.keys(nextHero).length === 0) {
+        const { hero, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, hero: nextHero };
+    });
+  }
+
+  function updateFooterField(
+    key: 'headline' | 'body' | 'ctaLabel',
+    value: string
+  ) {
+    setContentOverrides((prev) => {
+      const nextFooter = { ...(prev.footerCta ?? {}) } as Record<string, string>;
+      if (!value.trim()) {
+        delete nextFooter[key];
+      } else {
+        nextFooter[key] = value;
+      }
+      if (Object.keys(nextFooter).length === 0) {
+        const { footerCta, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, footerCta: nextFooter };
+    });
+  }
+
+  function updateAbout(value: string) {
+    setContentOverrides((prev) => {
+      if (!value.trim()) {
+        const { about, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, about: value };
+    });
+  }
+
+  function parseLines(value: string) {
+    return value
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }
+
+  function updateHighlights(value: string) {
+    const lines = parseLines(value);
+    setContentOverrides((prev) => {
+      if (lines.length === 0) {
+        const { highlights, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, highlights: lines };
+    });
+  }
+
+  function updateServices(value: string) {
+    const lines = parseLines(value);
+    setContentOverrides((prev) => {
+      if (lines.length === 0) {
+        const { services, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, services: lines };
+    });
   }
 
   return (
@@ -221,6 +374,80 @@ export function ConfigEditorClient(props: {
                   placeholder="(555) 555-5555"
                 />
               </div>
+              <div>
+                <label htmlFor="practiceAddress1" className="block text-sm font-medium mb-1">
+                  Address line 1
+                </label>
+                <input
+                  id="practiceAddress1"
+                  value={practiceAddress1}
+                  onChange={(e) => setPracticeAddress1(e.target.value)}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  placeholder="123 Main Street"
+                />
+              </div>
+              <div>
+                <label htmlFor="practiceAddress2" className="block text-sm font-medium mb-1">
+                  Address line 2 (optional)
+                </label>
+                <input
+                  id="practiceAddress2"
+                  value={practiceAddress2}
+                  onChange={(e) => setPracticeAddress2(e.target.value)}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  placeholder="Suite 200"
+                />
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="practiceCity" className="block text-sm font-medium mb-1">
+                    City
+                  </label>
+                  <input
+                    id="practiceCity"
+                    value={practiceCity}
+                    onChange={(e) => setPracticeCity(e.target.value)}
+                    className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                    placeholder="San Francisco"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="practiceState" className="block text-sm font-medium mb-1">
+                    State
+                  </label>
+                  <input
+                    id="practiceState"
+                    value={practiceState}
+                    onChange={(e) => setPracticeState(e.target.value)}
+                    className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                    placeholder="CA"
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="practiceZip" className="block text-sm font-medium mb-1">
+                  ZIP
+                </label>
+                <input
+                  id="practiceZip"
+                  value={practiceZip}
+                  onChange={(e) => setPracticeZip(e.target.value)}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  placeholder="94102"
+                />
+              </div>
+              <div>
+                <label htmlFor="practiceLogoUrl" className="block text-sm font-medium mb-1">
+                  Logo URL (optional)
+                </label>
+                <input
+                  id="practiceLogoUrl"
+                  value={practiceLogoUrl}
+                  onChange={(e) => setPracticeLogoUrl(e.target.value)}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  placeholder="https://..."
+                />
+              </div>
             </div>
           </div>
 
@@ -278,6 +505,121 @@ export function ConfigEditorClient(props: {
           </div>
 
           <div className="rounded-3xl border border-[var(--color-border)] bg-white p-6">
+            <h2 className="font-heading text-xl">Content</h2>
+            <div className="mt-4 space-y-4">
+              <div>
+                <label htmlFor="heroHeadline" className="block text-sm font-medium mb-1">
+                  Hero headline
+                </label>
+                <input
+                  id="heroHeadline"
+                  value={mergedContent.hero.headline}
+                  onChange={(e) => updateHeroField('headline', e.target.value)}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                />
+              </div>
+              <div>
+                <label htmlFor="heroSubhead" className="block text-sm font-medium mb-1">
+                  Hero subhead
+                </label>
+                <textarea
+                  id="heroSubhead"
+                  value={mergedContent.hero.subhead}
+                  onChange={(e) => updateHeroField('subhead', e.target.value)}
+                  rows={3}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                />
+              </div>
+              <div>
+                <label htmlFor="heroCta" className="block text-sm font-medium mb-1">
+                  Hero button label
+                </label>
+                <input
+                  id="heroCta"
+                  value={mergedContent.hero.ctaLabel}
+                  onChange={(e) => updateHeroField('ctaLabel', e.target.value)}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                />
+              </div>
+              <div>
+                <label htmlFor="highlights" className="block text-sm font-medium mb-1">
+                  Highlights (one per line)
+                </label>
+                <textarea
+                  id="highlights"
+                  value={mergedContent.highlights.join('\n')}
+                  onChange={(e) => updateHighlights(e.target.value)}
+                  rows={4}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                />
+              </div>
+              <div>
+                <label htmlFor="services" className="block text-sm font-medium mb-1">
+                  Services (one per line)
+                </label>
+                <textarea
+                  id="services"
+                  value={mergedContent.services.join('\n')}
+                  onChange={(e) => updateServices(e.target.value)}
+                  rows={4}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                />
+              </div>
+              <div>
+                <label htmlFor="aboutCopy" className="block text-sm font-medium mb-1">
+                  About copy
+                </label>
+                <textarea
+                  id="aboutCopy"
+                  value={mergedContent.about}
+                  onChange={(e) => updateAbout(e.target.value)}
+                  rows={4}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                />
+              </div>
+              <div className="space-y-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-cream)] p-4">
+                <div className="text-xs uppercase tracking-wider text-[var(--color-text-muted)]">
+                  Footer call to action
+                </div>
+                <div>
+                  <label htmlFor="footerHeadline" className="block text-sm font-medium mb-1">
+                    Headline
+                  </label>
+                  <input
+                    id="footerHeadline"
+                    value={mergedContent.footerCta.headline}
+                    onChange={(e) => updateFooterField('headline', e.target.value)}
+                    className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="footerBody" className="block text-sm font-medium mb-1">
+                    Body
+                  </label>
+                  <textarea
+                    id="footerBody"
+                    value={mergedContent.footerCta.body}
+                    onChange={(e) => updateFooterField('body', e.target.value)}
+                    rows={3}
+                    className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="footerCtaLabel" className="block text-sm font-medium mb-1">
+                    Button label
+                  </label>
+                  <input
+                    id="footerCtaLabel"
+                    value={mergedContent.footerCta.ctaLabel}
+                    onChange={(e) => updateFooterField('ctaLabel', e.target.value)}
+                    className="w-full rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-[var(--color-border)] bg-white p-6">
             <h2 className="font-heading text-xl">Version history</h2>
             {revisions.length === 0 ? (
               <p className="mt-3 text-sm text-[var(--color-text-secondary)]">No versions yet.</p>
@@ -312,10 +654,28 @@ export function ConfigEditorClient(props: {
         <section className="rounded-3xl bg-[var(--color-bg-cream)] p-6">
           <div data-look-preview style={previewStyle} className="rounded-2xl bg-white shadow-sm overflow-hidden">
             <div className="bg-[var(--color-bg-dark)] px-6 py-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs uppercase tracking-wider text-white/60">Preview</div>
-                  <div className="mt-1 font-heading text-xl text-white">{practiceName.trim() || 'Your practice'}</div>
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  {practiceLogoUrl.trim() ? (
+                    <img
+                      src={practiceLogoUrl.trim()}
+                      alt={`${practiceName.trim() || 'Practice'} logo`}
+                      className="h-10 w-10 rounded-full object-cover border border-white/20 bg-white/10"
+                    />
+                  ) : (
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-sm font-medium text-white">
+                      {logoInitials}
+                    </div>
+                  )}
+                  <div>
+                    <div className="text-xs uppercase tracking-wider text-white/60">Preview</div>
+                    <div className="mt-1 font-heading text-xl text-white">
+                      {practiceName.trim() || 'Your practice'}
+                    </div>
+                    {contactLine ? (
+                      <div className="mt-1 text-xs text-white/60">{contactLine}</div>
+                    ) : null}
+                  </div>
                 </div>
                 <div className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/80">
                   {lookTitle}
@@ -323,25 +683,66 @@ export function ConfigEditorClient(props: {
               </div>
             </div>
 
-            <div className="p-8">
-              <h3 className="font-heading text-2xl text-[var(--color-primary)]">Beautiful smiles start here.</h3>
-              <p className="mt-3 max-w-prose text-sm text-[var(--color-text-secondary)]">
-                This is a deterministic preview using your saved tokens. In Phase 2, this preview will render the full template and content packs.
-              </p>
+            <div className="p-8 space-y-8">
+              <div>
+                <h3 className="font-heading text-2xl text-[var(--color-primary)]">
+                  {mergedContent.hero.headline}
+                </h3>
+                <p className="mt-3 max-w-prose text-sm text-[var(--color-text-secondary)]">
+                  {mergedContent.hero.subhead}
+                </p>
 
-              <div className="mt-6 flex flex-wrap gap-3">
-                <span className="rounded-full bg-[var(--color-accent)] px-4 py-2 text-sm text-[var(--color-bg-dark)]">
-                  Book now
-                </span>
-                <span className="rounded-full border border-[var(--color-border)] px-4 py-2 text-sm text-[var(--color-text-secondary)]">
-                  Call {practicePhone.trim() || '(555) 555-5555'}
-                </span>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <span className="rounded-full bg-[var(--color-accent)] px-4 py-2 text-sm text-[var(--color-bg-dark)]">
+                    {mergedContent.hero.ctaLabel}
+                  </span>
+                  <span className="rounded-full border border-[var(--color-border)] px-4 py-2 text-sm text-[var(--color-text-secondary)]">
+                    Call {phoneLabel}
+                  </span>
+                </div>
               </div>
 
-              <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                <div className="aspect-square rounded-2xl bg-[var(--color-bg-mint)]" />
-                <div className="aspect-square rounded-2xl bg-[var(--color-bg-cream)] border border-[var(--color-border)]" />
-                <div className="aspect-square rounded-2xl bg-[var(--color-bg-white)] border border-[var(--color-border)]" />
+              <div className="flex flex-wrap gap-2">
+                {mergedContent.highlights.map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-full bg-[var(--color-bg-cream)] px-3 py-1 text-xs text-[var(--color-text-secondary)]"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                {mergedContent.services.map((service) => (
+                  <div
+                    key={service}
+                    className="rounded-2xl border border-[var(--color-border)] bg-white px-4 py-5 text-sm font-medium text-[var(--color-text-secondary)]"
+                  >
+                    {service}
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
+                <div className="text-xs uppercase tracking-wider text-[var(--color-text-muted)]">
+                  About
+                </div>
+                <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+                  {mergedContent.about}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-[var(--color-bg-mint)] p-6">
+                <h4 className="font-heading text-lg text-[var(--color-primary)]">
+                  {mergedContent.footerCta.headline}
+                </h4>
+                <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+                  {mergedContent.footerCta.body}
+                </p>
+                <div className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm text-[var(--color-primary)]">
+                  {mergedContent.footerCta.ctaLabel}
+                </div>
               </div>
             </div>
           </div>

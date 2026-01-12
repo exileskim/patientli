@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { lookContentOverridesSchemaV1 } from './content.schema';
 import { lookTokenOverridesSchemaV1 } from './tokens.schema';
 
 export const practicePersonalizationSchemaV1 = z.object({
@@ -15,6 +16,7 @@ export const practicePersonalizationSchemaV1 = z.object({
 
 export const lookConfigPatchSchemaV1 = z.object({
   tokenOverrides: lookTokenOverridesSchemaV1.default({}),
+  contentOverrides: lookContentOverridesSchemaV1.default({}),
   practice: practicePersonalizationSchemaV1,
   industry: z.literal('dental').default('dental'),
 });
@@ -26,6 +28,7 @@ export const lookConfigDocumentSchemaV1 = z.object({
   lookSlug: z.string().min(1),
   lookVersion: z.number().int().positive(),
   tokenOverrides: lookTokenOverridesSchemaV1.default({}),
+  contentOverrides: lookContentOverridesSchemaV1.default({}),
   practice: practicePersonalizationSchemaV1,
   industry: z.literal('dental').default('dental'),
 });
