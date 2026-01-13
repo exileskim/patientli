@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 
+import looksData from '@/content/looks.json';
 import type { HubspotFormConfig, HubspotMeetingConfig } from '@/lib/marketing-content';
 
 declare global {
@@ -17,6 +18,17 @@ declare global {
     Swiper?: new (element: Element | string, config: Record<string, unknown>) => unknown;
   }
 }
+
+type LookRecord = { id?: string; slug?: string };
+
+const nonLookSlugs = new Set(['basic', 'starter', 'growth', 'full-ai-visibility-report']);
+const lookIdToSlug = new Map<string, string>();
+
+(looksData as LookRecord[]).forEach((look) => {
+  if (!look?.id || !look.slug) return;
+  if (nonLookSlugs.has(look.slug)) return;
+  lookIdToSlug.set(String(look.id), look.slug);
+});
 
 const loadedScripts = new Set<string>();
 
@@ -202,6 +214,143 @@ function initAccordions(root: ParentNode) {
       });
     });
   });
+}
+
+function getLookSlugFromPath(pathname: string) {
+  const normalized = pathname.split('?')[0] || '';
+  if (!normalized.startsWith('/looks/')) return null;
+  const parts = normalized.split('/').filter(Boolean);
+  if (parts.length < 2) return null;
+  if (parts[0] !== 'looks') return null;
+  return parts[1] ?? null;
+}
+
+function resolveLookSlugFromContext() {
+  const direct = getLookSlugFromPath(window.location.pathname);
+  if (direct) return direct;
+
+  try {
+    if (document.referrer) {
+      const referrer = new URL(document.referrer);
+      const fromReferrer = getLookSlugFromPath(referrer.pathname);
+      if (fromReferrer) return fromReferrer;
+    }
+  } catch {
+    // ignore
+  }
+
+  try {
+    const stored = sessionStorage.getItem('lastLookSlug');
+    return stored || null;
+  } catch {
+    return null;
+  }
+}
+
+function getLookSlugFromProductId(productId: string | null) {
+  if (!productId) return null;
+  return lookIdToSlug.get(productId) ?? null;
+}
+
+function getLookSlugFromHref(href: string) {
+  if (!href) return null;
+  try {
+    const url = new URL(href, window.location.origin);
+    return getLookSlugFromPath(url.pathname);
+  } catch {
+    return null;
+  }
+}
+
+function findLookSlugFromAnchor(anchor: HTMLAnchorElement) {
+  const direct = getLookSlugFromHref(anchor.href);
+  if (direct) return direct;
+
+  const container =
+    anchor.closest<HTMLElement>('[data-elementor-type="loop-item"], .e-loop-item, .product') ??
+    anchor.closest<HTMLElement>('.elementor-widget');
+  if (!container) return null;
+
+  const lookLink = container.querySelector<HTMLAnchorElement>('a[href*="/looks/"]');
+  if (!lookLink) return null;
+  return getLookSlugFromHref(lookLink.href);
+}
+
+function normalizeRedirectPath(raw: string | null) {
+  if (!raw) return null;
+  let candidate = raw;
+  try {
+    candidate = decodeURIComponent(candidate);
+  } catch {
+    // ignore
+  }
+
+  try {
+    const url = new URL(candidate, window.location.origin);
+    candidate = `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    if (!candidate.startsWith('/')) return null;
+  }
+
+  if (candidate.startsWith('/choose-your-plan') || candidate.startsWith('/checkout')) {
+    return '/pricing';
+  }
+
+  return candidate;
+}
+
+function resolveAddToCartDestination(
+  searchParams: URLSearchParams,
+  anchor?: HTMLAnchorElement,
+) {
+  const productId = searchParams.get('add-to-cart');
+  if (!productId) return null;
+
+  const slug =
+    (anchor ? findLookSlugFromAnchor(anchor) : null) ??
+    getLookSlugFromProductId(productId) ??
+    resolveLookSlugFromContext();
+  if (slug) return `/looks-preview/${slug}`;
+
+  const redirect =
+    normalizeRedirectPath(searchParams.get('e-redirect') ?? searchParams.get('redirect_to')) ??
+    '/pricing';
+  return redirect;
+}
+
+function initAddToCartRedirects() {
+  const currentSlug = getLookSlugFromPath(window.location.pathname);
+  if (currentSlug) {
+    try {
+      sessionStorage.setItem('lastLookSlug', currentSlug);
+    } catch {
+      // ignore
+    }
+  }
+
+  const currentParams = new URLSearchParams(window.location.search);
+  const initialDestination = resolveAddToCartDestination(currentParams);
+  if (initialDestination && initialDestination !== window.location.pathname) {
+    window.location.replace(initialDestination);
+  }
+
+  const handleClick = (event: MouseEvent) => {
+    const target = event.target as HTMLElement | null;
+    const anchor = target?.closest<HTMLAnchorElement>('a');
+    if (!anchor) return;
+    const href = anchor.getAttribute('href') ?? '';
+    if (!href.includes('add-to-cart')) return;
+
+    const url = new URL(anchor.href, window.location.origin);
+    const destination = resolveAddToCartDestination(url.searchParams, anchor);
+    if (!destination) return;
+
+    event.preventDefault();
+    window.location.assign(destination);
+  };
+
+  document.addEventListener('click', handleClick);
+  return () => document.removeEventListener('click', handleClick);
 }
 
 function initPasswordToggles(root: ParentNode) {
@@ -843,12 +992,17 @@ export default function MarketingScripts({
 }: MarketingScriptsProps) {
   useEffect(() => {
     const root = document;
+    const cleanupRedirects = initAddToCartRedirects();
     initEnhancements(root);
     initCarouselsWithScript(root).catch(() => undefined);
     const scriptForms = extractHubspotFormsFromScripts(scripts);
     const mergedForms = mergeHubspotForms(hubspotForms, scriptForms, root);
     initHubspotForms(mergedForms).catch(() => undefined);
     initHubspotMeetings(hubspotMeetings).catch(() => undefined);
+
+    return () => {
+      cleanupRedirects?.();
+    };
   }, [hubspotForms, hubspotMeetings, scripts]);
 
   return null;
