@@ -121,6 +121,23 @@ function normalizePreview(value: unknown): string[] {
   return [];
 }
 
+function renderPreviewImage(src: string, alt: string) {
+  const isSvg = src.toLowerCase().endsWith('.svg');
+  const wrapperClass = [
+    'rounded-2xl border border-black/5 shadow-lg overflow-hidden',
+    isSvg ? 'bg-[var(--color-bg-dark)]' : 'bg-white',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const imageClass = isSvg ? 'w-full h-40 object-contain p-8' : 'w-full h-auto';
+
+  return (
+    <div className={wrapperClass}>
+      <img src={src} alt={alt} className={imageClass} loading="lazy" />
+    </div>
+  );
+}
+
 export default function LooksPreviewClient({ slug }: { slug: string }) {
   const [activeTab, setActiveTab] = useState<PreviewTab>('desktop');
   const router = useRouter();
@@ -835,13 +852,12 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                       {previewImages.desktop.length ? (
                         <div className="space-y-6">
                           {previewImages.desktop.map((src, index) => (
-                            <img
-                              key={`${src}-${index}`}
-                              src={src}
-                              alt={`${look.title} desktop preview ${index + 1}`}
-                              className="w-full rounded-2xl border border-black/5 shadow-lg"
-                              loading="lazy"
-                            />
+                            <div key={`${src}-${index}`}>
+                              {renderPreviewImage(
+                                src,
+                                `${look.title} desktop preview ${index + 1}`
+                              )}
+                            </div>
                           ))}
                         </div>
                       ) : (
@@ -858,13 +874,12 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                       {previewImages.mobile.length ? (
                         <div className="mx-auto max-w-sm space-y-6">
                           {previewImages.mobile.map((src, index) => (
-                            <img
-                              key={`${src}-${index}`}
-                              src={src}
-                              alt={`${look.title} mobile preview ${index + 1}`}
-                              className="w-full rounded-2xl border border-black/5 shadow-lg"
-                              loading="lazy"
-                            />
+                            <div key={`${src}-${index}`}>
+                              {renderPreviewImage(
+                                src,
+                                `${look.title} mobile preview ${index + 1}`
+                              )}
+                            </div>
                           ))}
                         </div>
                       ) : (
@@ -881,13 +896,12 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                       {previewImages.print.length ? (
                         <div className="grid gap-6 md:grid-cols-2">
                           {previewImages.print.map((src, index) => (
-                            <img
-                              key={`${src}-${index}`}
-                              src={src}
-                              alt={`${look.title} print preview ${index + 1}`}
-                              className="w-full rounded-2xl border border-black/5 shadow-lg bg-white"
-                              loading="lazy"
-                            />
+                            <div key={`${src}-${index}`}>
+                              {renderPreviewImage(
+                                src,
+                                `${look.title} print preview ${index + 1}`
+                              )}
+                            </div>
                           ))}
                         </div>
                       ) : (
@@ -904,13 +918,12 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                       {previewImages.promotional.length ? (
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                           {previewImages.promotional.map((src, index) => (
-                            <img
-                              key={`${src}-${index}`}
-                              src={src}
-                              alt={`${look.title} promotional preview ${index + 1}`}
-                              className="w-full rounded-2xl border border-black/5 shadow-lg bg-white"
-                              loading="lazy"
-                            />
+                            <div key={`${src}-${index}`}>
+                              {renderPreviewImage(
+                                src,
+                                `${look.title} promotional preview ${index + 1}`
+                              )}
+                            </div>
                           ))}
                         </div>
                       ) : (
@@ -927,13 +940,12 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                       {previewImages.social.length ? (
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                           {previewImages.social.map((src, index) => (
-                            <img
-                              key={`${src}-${index}`}
-                              src={src}
-                              alt={`${look.title} social preview ${index + 1}`}
-                              className="w-full rounded-2xl border border-black/5 shadow-lg bg-white"
-                              loading="lazy"
-                            />
+                            <div key={`${src}-${index}`}>
+                              {renderPreviewImage(
+                                src,
+                                `${look.title} social preview ${index + 1}`
+                              )}
+                            </div>
                           ))}
                         </div>
                       ) : (

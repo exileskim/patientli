@@ -137,6 +137,21 @@ const updated = looks.map((look) => {
     return look;
   }
 
+  const allImages = Array.from(
+    new Set(
+      [...page.html.matchAll(/<img[^>]+src=\"([^\"]+)\"/g)].map((img) => img[1]),
+    ),
+  );
+  const tabImageSet = new Set(
+    Object.values(previews)
+      .flat()
+      .filter((src) => typeof src === 'string'),
+  );
+  const extraImages = allImages.filter((src) => !tabImageSet.has(src));
+  const socialExtras = extraImages.length
+    ? Array.from(new Set([...(previews.social ?? []), ...extraImages]))
+    : previews.social ?? [];
+
   return {
     ...look,
     previews: {
@@ -144,7 +159,7 @@ const updated = looks.map((look) => {
       mobile: previews.mobile ?? [],
       print: previews.print ?? [],
       promotional: previews.promotional ?? [],
-      social: previews.social ?? [],
+      social: socialExtras,
     },
   };
 });
