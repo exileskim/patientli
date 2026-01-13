@@ -64,14 +64,6 @@ const previewTabs: { id: PreviewTab; label: string; icon: React.ReactNode }[] = 
   },
 ];
 
-type LookPreviewPayload = {
-  desktop?: string[] | string;
-  mobile?: string[] | string;
-  print?: string[] | string;
-  promotional?: string[] | string;
-  social?: string[] | string;
-};
-
 type LookEntry = {
   id: string;
   slug: string;
@@ -84,7 +76,6 @@ type LookEntry = {
     accent: string;
     background: string;
   };
-  previews?: LookPreviewPayload;
 };
 
 
@@ -112,31 +103,6 @@ const fontPairs = [
   },
 ];
 
-function normalizePreview(value: unknown): string[] {
-  if (!value) return [];
-  if (Array.isArray(value)) {
-    return value.filter((entry): entry is string => typeof entry === 'string' && entry.length > 0);
-  }
-  if (typeof value === 'string') return [value];
-  return [];
-}
-
-function renderPreviewImage(src: string, alt: string) {
-  const isSvg = src.toLowerCase().endsWith('.svg');
-  const wrapperClass = [
-    'rounded-2xl border border-black/5 shadow-lg overflow-hidden',
-    isSvg ? 'bg-[var(--color-bg-dark)]' : 'bg-white',
-  ]
-    .filter(Boolean)
-    .join(' ');
-  const imageClass = isSvg ? 'w-full h-40 object-contain p-8' : 'w-full h-auto';
-
-  return (
-    <div className={wrapperClass}>
-      <img src={src} alt={alt} className={imageClass} loading="lazy" />
-    </div>
-  );
-}
 
 export default function LooksPreviewClient({ slug }: { slug: string }) {
   const [activeTab, setActiveTab] = useState<PreviewTab>('desktop');
@@ -212,6 +178,14 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
     () => mergeLookContentV1(baseContent, contentOverrides),
     [baseContent, contentOverrides]
   );
+  const highlightItems = mergedContent.highlights.slice(0, 3);
+  const serviceItems = mergedContent.services.slice(0, 3);
+  const paletteItems = [
+    { label: 'Primary', value: mergedTokens.color.primary },
+    { label: 'Accent', value: mergedTokens.color.accent },
+    { label: 'Surface', value: mergedTokens.color.surface },
+    { label: 'Background', value: mergedTokens.color.bg },
+  ];
 
   const livePreview = (
     <div className="rounded-2xl border border-black/5 overflow-hidden bg-white">
@@ -245,22 +219,197 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
     </div>
   );
 
-  const liveSocialPreview = (
-    <div className="rounded-2xl border border-black/5 overflow-hidden bg-white">
-      <div className="bg-[var(--color-bg-dark)] text-white p-6">
-        <p className="text-xs uppercase tracking-[0.2em] text-white/60">Social post</p>
-        <h3 className="mt-3 font-heading text-xl">{mergedContent.hero.headline}</h3>
-        <p className="mt-2 text-sm text-white/75">{mergedContent.hero.subhead}</p>
+  const brandBoardPreview = (
+    <div className="rounded-2xl border border-black/5 overflow-hidden bg-white p-5">
+      <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+        Brand board
+      </p>
+      <h3 className="mt-3 font-heading text-lg text-[var(--color-primary)]">{displayName}</h3>
+      <p className="mt-1 text-xs text-[var(--color-text-muted)]">{mergedContent.hero.subhead}</p>
+      <div className="mt-4 grid grid-cols-4 gap-2">
+        {paletteItems.map((item) => (
+          <div key={item.label} className="space-y-1 text-[10px] text-[var(--color-text-muted)]">
+            <div className="h-8 rounded-xl" style={{ backgroundColor: item.value }} />
+            <span>{item.label}</span>
+          </div>
+        ))}
       </div>
-      <div className="p-5 text-xs text-[var(--color-text-secondary)]">
-        <p className="font-semibold text-[var(--color-primary)]">{displayName}</p>
-        <p className="mt-1 text-[var(--color-text-muted)]">{contactLine || phoneDisplay}</p>
+      <div className="mt-4 text-xs text-[var(--color-text-muted)]">
+        <span className="font-heading">Aa</span> <span className="font-body">Bb</span>
+      </div>
+    </div>
+  );
+
+  const heroPreview = (
+    <div className="rounded-2xl border border-black/5 overflow-hidden">
+      <div className="bg-[var(--color-bg-dark)] text-white p-6">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-white/60">Homepage hero</p>
+        <h3 className="mt-3 font-heading text-2xl">{mergedContent.hero.headline}</h3>
+        <p className="mt-2 text-sm text-white/75">{mergedContent.hero.subhead}</p>
+        <div className="mt-4 flex flex-wrap gap-2 text-xs">
+          <span className="rounded-full bg-white px-3 py-1 text-[var(--color-primary)]">
+            {mergedContent.hero.ctaLabel}
+          </span>
+          <span className="rounded-full border border-white/40 px-3 py-1 text-white/90">
+            Call {phoneDisplay}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  const highlightsPreview = (
+    <div className="rounded-2xl border border-black/5 bg-white p-5">
+      <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+        Highlights
+      </p>
+      <ul className="mt-3 space-y-2 text-sm text-[var(--color-text-secondary)]">
+        {highlightItems.map((highlight) => (
+          <li key={highlight} className="flex items-start gap-2">
+            <span className="mt-1 h-2 w-2 rounded-full bg-[var(--color-accent)]" />
+            <span>{highlight}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+
+  const servicesPreview = (
+    <div className="rounded-2xl border border-black/5 bg-[var(--color-bg-cream)] p-5">
+      <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+        Services
+      </p>
+      <div className="mt-3 grid gap-2 text-sm text-[var(--color-text-secondary)]">
+        {serviceItems.map((service) => (
+          <div key={service} className="rounded-lg bg-white px-3 py-2">
+            {service}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const ctaPreview = (
+    <div className="rounded-2xl border border-black/5 bg-white p-5">
+      <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+        Call to action
+      </p>
+      <h3 className="mt-3 font-heading text-lg text-[var(--color-primary)]">
+        {mergedContent.footerCta.headline}
+      </h3>
+      <p className="mt-2 text-xs text-[var(--color-text-muted)]">{mergedContent.footerCta.body}</p>
+      <div className="mt-4 inline-flex rounded-full bg-[var(--color-accent)] px-4 py-2 text-xs font-medium text-[var(--color-primary)]">
+        {mergedContent.footerCta.ctaLabel}
+      </div>
+    </div>
+  );
+
+  const desktopGallery = (
+    <div className="grid gap-6 md:grid-cols-2">
+      {heroPreview}
+      {brandBoardPreview}
+      {highlightsPreview}
+      {servicesPreview}
+      {ctaPreview}
+    </div>
+  );
+
+  const mobileGallery = (
+    <div className="grid gap-6">
+      <div className="aspect-[9/16] rounded-2xl border border-black/5 overflow-hidden bg-white">
+        <div className="bg-[var(--color-bg-dark)] text-white p-4">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-white/60">Mobile hero</p>
+          <h3 className="mt-2 font-heading text-lg">{mergedContent.hero.headline}</h3>
+          <p className="mt-2 text-xs text-white/75">{mergedContent.hero.subhead}</p>
+        </div>
+        <div className="p-4 text-xs text-[var(--color-text-muted)]">
+          {highlightItems.map((highlight) => (
+            <p key={highlight} className="mt-2 rounded-lg bg-[var(--color-bg-cream)] px-3 py-2">
+              {highlight}
+            </p>
+          ))}
+        </div>
+      </div>
+      <div className="aspect-[9/16] rounded-2xl border border-black/5 overflow-hidden bg-white p-4">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          Mobile services
+        </p>
+        <div className="mt-4 space-y-2 text-sm text-[var(--color-text-secondary)]">
+          {serviceItems.map((service) => (
+            <div key={service} className="rounded-xl bg-[var(--color-bg-cream)] px-3 py-2">
+              {service}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="aspect-[9/16] rounded-2xl border border-black/5 overflow-hidden bg-[var(--color-bg-dark)] text-white p-4">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-white/60">Mobile CTA</p>
+        <h3 className="mt-3 font-heading text-lg">{mergedContent.footerCta.headline}</h3>
+        <p className="mt-2 text-xs text-white/75">{mergedContent.footerCta.body}</p>
+        <div className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-xs text-[var(--color-primary)]">
+          {mergedContent.footerCta.ctaLabel}
+        </div>
+      </div>
+    </div>
+  );
+
+  const liveSocialGallery = (
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="rounded-2xl border border-black/5 overflow-hidden bg-[var(--color-bg-dark)] text-white p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-white/60">Social post</p>
+        <h3 className="mt-3 font-heading text-lg">{mergedContent.hero.headline}</h3>
+        <p className="mt-2 text-xs text-white/75">{mergedContent.hero.subhead}</p>
+      </div>
+      <div className="rounded-2xl border border-black/5 overflow-hidden bg-white p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">New patient</p>
+        <h3 className="mt-3 font-heading text-lg text-[var(--color-primary)]">
+          Now welcoming new patients
+        </h3>
+        <p className="mt-2 text-xs text-[var(--color-text-muted)]">
+          {displayName} appointments are open this week.
+        </p>
+      </div>
+      <div className="rounded-2xl border border-black/5 overflow-hidden bg-[var(--color-bg-cream)] p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          Highlight
+        </p>
+        <h3 className="mt-3 font-heading text-lg text-[var(--color-primary)]">
+          {highlightItems[0]}
+        </h3>
+        <p className="mt-2 text-xs text-[var(--color-text-muted)]">{contactLine || phoneDisplay}</p>
+      </div>
+      <div className="rounded-2xl border border-black/5 overflow-hidden bg-white p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          Featured service
+        </p>
+        <h3 className="mt-3 font-heading text-lg text-[var(--color-primary)]">
+          {serviceItems[0]}
+        </h3>
+        <p className="mt-2 text-xs text-[var(--color-text-muted)]">{mergedContent.about}</p>
+      </div>
+      <div className="rounded-2xl border border-black/5 overflow-hidden bg-[var(--color-bg-dark)] text-white p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-white/60">Patient note</p>
+        <p className="mt-3 text-xs text-white/75">
+          &quot;The team at {displayName} made my visit easy and stress-free.&quot;
+        </p>
+        <p className="mt-4 text-xs text-white/60">— {displayName} patient</p>
+      </div>
+      <div className="rounded-2xl border border-black/5 overflow-hidden bg-white p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          Call to action
+        </p>
+        <h3 className="mt-3 font-heading text-lg text-[var(--color-primary)]">
+          {mergedContent.footerCta.headline}
+        </h3>
+        <div className="mt-4 inline-flex rounded-full bg-[var(--color-accent)] px-4 py-2 text-xs font-medium text-[var(--color-primary)]">
+          {mergedContent.footerCta.ctaLabel}
+        </div>
       </div>
     </div>
   );
 
   const livePrintPreview = (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <div className="rounded-2xl border border-black/5 bg-white p-5">
         <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
           Letterhead
@@ -276,11 +425,21 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
         <p className="mt-3 font-heading text-lg text-[var(--color-primary)]">{displayName}</p>
         <p className="mt-2 text-xs text-[var(--color-text-muted)]">{mergedContent.hero.subhead}</p>
       </div>
+      <div className="rounded-2xl border border-black/5 bg-white p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          Business card
+        </p>
+        <div className="mt-4 rounded-xl bg-[var(--color-bg-dark)] p-4 text-white">
+          <p className="text-xs uppercase tracking-[0.2em] text-white/60">Patientli look</p>
+          <p className="mt-2 font-heading text-sm">{displayName}</p>
+          <p className="mt-1 text-xs text-white/70">{contactLine || phoneDisplay}</p>
+        </div>
+      </div>
     </div>
   );
 
   const livePromotionalPreview = (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <div className="rounded-2xl border border-black/5 bg-white p-5">
         <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
           Tote bag
@@ -297,30 +456,25 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
           {displayName}
         </div>
       </div>
+      <div className="rounded-2xl border border-black/5 bg-white p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          ID badge
+        </p>
+        <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-cream)] p-4 text-[var(--color-primary)]">
+          <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+            Team member
+          </p>
+          <p className="mt-2 font-heading text-sm">{displayName}</p>
+          <p className="mt-1 text-xs text-[var(--color-text-muted)]">Dr. Jane Smith</p>
+        </div>
+      </div>
     </div>
-  );
-
-  const staticNote = (
-    <p className="text-xs text-[var(--color-text-muted)]">
-      Brand kit samples are static and keep the original look name.
-    </p>
   );
 
   const previewStyle = useMemo(
     () => cssVarsFromLookTokensV1(mergedTokens),
     [mergedTokens]
   );
-
-  const previewImages = useMemo(() => {
-    const previews: LookPreviewPayload = look?.previews ?? {};
-    return {
-      desktop: normalizePreview(previews.desktop),
-      mobile: normalizePreview(previews.mobile),
-      print: normalizePreview(previews.print),
-      promotional: normalizePreview(previews.promotional),
-      social: normalizePreview(previews.social),
-    };
-  }, [look]);
 
   const practice = useMemo(
     () => ({
@@ -960,29 +1114,12 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                           </p>
                           {livePreview}
                         </div>
-
-                        {previewImages.desktop.length ? (
-                          <div className="space-y-3">
-                            <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-                              Brand kit screenshot
-                            </p>
-                            {staticNote}
-                            <div className="space-y-6">
-                              {previewImages.desktop.map((src, index) => (
-                                <div key={`${src}-${index}`}>
-                                  {renderPreviewImage(
-                                    src,
-                                    `${look.title} desktop preview ${index + 1}`
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
-                            Desktop screenshot coming soon.
-                          </div>
-                        )}
+                        <div className="space-y-3">
+                          <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                            Personalized brand kit
+                          </p>
+                          {desktopGallery}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -997,29 +1134,12 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                           </p>
                           <div className="mx-auto max-w-sm">{livePreview}</div>
                         </div>
-
-                        {previewImages.mobile.length ? (
-                          <div className="space-y-3">
-                            <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-                              Brand kit screenshot
-                            </p>
-                            {staticNote}
-                            <div className="mx-auto max-w-sm space-y-6">
-                              {previewImages.mobile.map((src, index) => (
-                                <div key={`${src}-${index}`}>
-                                  {renderPreviewImage(
-                                    src,
-                                    `${look.title} mobile preview ${index + 1}`
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
-                            Mobile screenshot coming soon.
-                          </div>
-                        )}
+                        <div className="space-y-3">
+                          <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                            Personalized mobile screens
+                          </p>
+                          <div className="mx-auto max-w-sm">{mobileGallery}</div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1027,36 +1147,11 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                   {/* Print Materials Preview */}
                   {activeTab === 'print' && (
                     <div className="p-6">
-                      <div className="space-y-6">
-                        <div className="space-y-3">
-                          <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-                            Personalized print preview
-                          </p>
-                          {livePrintPreview}
-                        </div>
-
-                        {previewImages.print.length ? (
-                          <div className="space-y-3">
-                            <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-                              Brand kit screenshot
-                            </p>
-                            {staticNote}
-                            <div className="grid gap-6 md:grid-cols-2">
-                              {previewImages.print.map((src, index) => (
-                                <div key={`${src}-${index}`}>
-                                  {renderPreviewImage(
-                                    src,
-                                    `${look.title} print preview ${index + 1}`
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
-                            Print materials preview coming soon.
-                          </div>
-                        )}
+                      <div className="space-y-3">
+                        <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                          Personalized print preview
+                        </p>
+                        {livePrintPreview}
                       </div>
                     </div>
                   )}
@@ -1064,36 +1159,11 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                   {/* Promotional Products Preview */}
                   {activeTab === 'promotional' && (
                     <div className="p-6">
-                      <div className="space-y-6">
-                        <div className="space-y-3">
-                          <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-                            Personalized promotional preview
-                          </p>
-                          {livePromotionalPreview}
-                        </div>
-
-                        {previewImages.promotional.length ? (
-                          <div className="space-y-3">
-                            <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-                              Brand kit screenshot
-                            </p>
-                            {staticNote}
-                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                              {previewImages.promotional.map((src, index) => (
-                                <div key={`${src}-${index}`}>
-                                  {renderPreviewImage(
-                                    src,
-                                    `${look.title} promotional preview ${index + 1}`
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
-                            Promotional preview coming soon.
-                          </div>
-                        )}
+                      <div className="space-y-3">
+                        <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                          Personalized promotional preview
+                        </p>
+                        {livePromotionalPreview}
                       </div>
                     </div>
                   )}
@@ -1101,36 +1171,11 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                   {/* Social Media Preview */}
                   {activeTab === 'social' && (
                     <div className="p-6">
-                      <div className="space-y-6">
-                        <div className="space-y-3">
-                          <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-                            Personalized social preview
-                          </p>
-                          {liveSocialPreview}
-                        </div>
-
-                        {previewImages.social.length ? (
-                          <div className="space-y-3">
-                            <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-                              Brand kit screenshot
-                            </p>
-                            {staticNote}
-                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                              {previewImages.social.map((src, index) => (
-                                <div key={`${src}-${index}`}>
-                                  {renderPreviewImage(
-                                    src,
-                                    `${look.title} social preview ${index + 1}`
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
-                            Social media preview coming soon.
-                          </div>
-                        )}
+                      <div className="space-y-3">
+                        <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                          Personalized social preview
+                        </p>
+                        {liveSocialGallery}
                       </div>
                     </div>
                   )}
