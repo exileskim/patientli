@@ -6,8 +6,6 @@ export interface Look {
   title: string;
   description: string;
   shortDescription: string;
-  featuredImage: string;
-  bentoImage: string;
   practiceTypes: string[];
   tags: string[];
   colors: {
@@ -19,13 +17,6 @@ export interface Look {
   fonts: {
     heading: string;
     body: string;
-  };
-  previews: {
-    desktop: string;
-    mobile: string;
-    print: string[];
-    promotional: string[];
-    social: string[];
   };
   createdAt: string;
   updatedAt: string;
