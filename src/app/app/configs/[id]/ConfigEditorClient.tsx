@@ -7,6 +7,8 @@ import type { LookContentOverridesV1 } from '@/modules/looks/domain/content.sche
 import type { LookConfigDocumentV1 } from '@/modules/looks/domain/config.schema';
 import type { LookTokenOverridesV1, LookTokensV1 } from '@/modules/looks/domain/tokens.schema';
 import { getDefaultLookContent, mergeLookContentV1 } from '@/modules/looks/ui/content';
+import { heroImageForLookSlug } from '@/modules/looks/ui/preview-assets';
+import { getLookWebsiteTemplate, LookWebsitePreview } from '@/modules/looks/ui/site-templates';
 import { cssVarsFromLookTokensV1, mergeLookTokensV1 } from '@/modules/looks/ui/tokens';
 
 type RevisionListItem = { id: string; revision: number; createdAt: string };
@@ -71,8 +73,8 @@ export function ConfigEditorClient(props: {
   );
 
   const baseContent = useMemo(
-    () => getDefaultLookContent({ practiceName }),
-    [practiceName]
+    () => getDefaultLookContent({ practiceName, lookSlug }),
+    [practiceName, lookSlug]
   );
 
   const mergedContent = useMemo(
@@ -137,6 +139,9 @@ export function ConfigEditorClient(props: {
     [practicePhone]
   );
 
+  const heroImage = useMemo(() => heroImageForLookSlug(lookSlug), [lookSlug]);
+  const siteTemplate = useMemo(() => getLookWebsiteTemplate(lookSlug), [lookSlug]);
+
   const logoInitials = useMemo(() => {
     const parts = practiceName.trim().split(/\s+/).filter(Boolean);
     if (parts.length === 0) return 'PL';
@@ -148,7 +153,7 @@ export function ConfigEditorClient(props: {
 
   async function handleCopyPreviewLink() {
     setStatusMessage(null);
-    const url = `${window.location.origin}/looks/${lookSlug}?id=${configId}`;
+    const url = `${window.location.origin}/looks-preview/${lookSlug}?id=${configId}`;
     await navigator.clipboard.writeText(url);
     setStatusMessage('Preview link copied.');
   }
@@ -652,98 +657,19 @@ export function ConfigEditorClient(props: {
         </aside>
 
         <section className="rounded-3xl bg-[var(--color-bg-cream)] p-6">
-          <div data-look-preview style={previewStyle} className="rounded-2xl bg-white shadow-sm overflow-hidden">
-            <div className="bg-[var(--color-bg-dark)] px-6 py-5">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  {practiceLogoUrl.trim() ? (
-                    <img
-                      src={practiceLogoUrl.trim()}
-                      alt={`${practiceName.trim() || 'Practice'} logo`}
-                      className="h-10 w-10 rounded-full object-cover border border-white/20 bg-white/10"
-                    />
-                  ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-sm font-medium text-white">
-                      {logoInitials}
-                    </div>
-                  )}
-                  <div>
-                    <div className="text-xs uppercase tracking-wider text-white/60">Preview</div>
-                    <div className="mt-1 font-heading text-xl text-white">
-                      {practiceName.trim() || 'Your practice'}
-                    </div>
-                    {contactLine ? (
-                      <div className="mt-1 text-xs text-white/60">{contactLine}</div>
-                    ) : null}
-                  </div>
-                </div>
-                <div className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/80">
-                  {lookTitle}
-                </div>
-              </div>
-            </div>
-
-            <div className="p-8 space-y-8">
-              <div>
-                <h3 className="font-heading text-2xl text-[var(--color-primary)]">
-                  {mergedContent.hero.headline}
-                </h3>
-                <p className="mt-3 max-w-prose text-sm text-[var(--color-text-secondary)]">
-                  {mergedContent.hero.subhead}
-                </p>
-
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <span className="rounded-full bg-[var(--color-accent)] px-4 py-2 text-sm text-[var(--color-bg-dark)]">
-                    {mergedContent.hero.ctaLabel}
-                  </span>
-                  <span className="rounded-full border border-[var(--color-border)] px-4 py-2 text-sm text-[var(--color-text-secondary)]">
-                    Call {phoneLabel}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {mergedContent.highlights.map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full bg-[var(--color-bg-cream)] px-3 py-1 text-xs text-[var(--color-text-secondary)]"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-3">
-                {mergedContent.services.map((service) => (
-                  <div
-                    key={service}
-                    className="rounded-2xl border border-[var(--color-border)] bg-white px-4 py-5 text-sm font-medium text-[var(--color-text-secondary)]"
-                  >
-                    {service}
-                  </div>
-                ))}
-              </div>
-
-              <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
-                <div className="text-xs uppercase tracking-wider text-[var(--color-text-muted)]">
-                  About
-                </div>
-                <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-                  {mergedContent.about}
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-[var(--color-bg-mint)] p-6">
-                <h4 className="font-heading text-lg text-[var(--color-primary)]">
-                  {mergedContent.footerCta.headline}
-                </h4>
-                <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-                  {mergedContent.footerCta.body}
-                </p>
-                <div className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm text-[var(--color-primary)]">
-                  {mergedContent.footerCta.ctaLabel}
-                </div>
-              </div>
+          <div data-look-preview style={previewStyle} className="rounded-2xl bg-[var(--color-bg-cream)] p-6">
+            <div className="max-h-[72vh] overflow-y-auto">
+              <LookWebsitePreview
+                template={siteTemplate}
+                displayName={practiceName.trim() || 'Your practice'}
+                practiceLogoUrl={practiceLogoUrl.trim() || undefined}
+                phoneDisplay={phoneLabel}
+                contactLine={contactLine || phoneLabel}
+                heroImage={heroImage}
+                content={mergedContent}
+                highlights={mergedContent.highlights}
+                services={mergedContent.services}
+              />
             </div>
           </div>
         </section>

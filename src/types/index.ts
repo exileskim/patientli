@@ -6,7 +6,6 @@ export interface Look {
   title: string;
   description: string;
   shortDescription: string;
-  featuredImage: string;
   bentoImage: string;
   practiceTypes: string[];
   tags: string[];
