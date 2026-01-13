@@ -155,6 +155,17 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
   const [contentOverrides, setContentOverrides] = useState<LookContentOverridesV1>({});
   const [shareMessage, setShareMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const displayName = practiceName.trim() || 'Your Practice';
+  const phoneDisplay = practicePhone.trim() || '(555) 555-5555';
+  const addressLine = [practiceAddress1, practiceAddress2]
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .join(' ');
+  const cityLine = [practiceCity, practiceState, practiceZip]
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .join(' ');
+  const contactLine = [addressLine, cityLine].filter(Boolean).join(' / ');
 
   const lookSlug = slug;
   const look = useMemo(
@@ -200,6 +211,99 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
   const mergedContent = useMemo(
     () => mergeLookContentV1(baseContent, contentOverrides),
     [baseContent, contentOverrides]
+  );
+
+  const livePreview = (
+    <div className="rounded-2xl border border-black/5 overflow-hidden bg-white">
+      <div className="bg-[var(--color-bg-dark)] text-white p-6">
+        <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-white/60">
+          <span>Live preview</span>
+          <span>{displayName}</span>
+        </div>
+        <h2 className="mt-3 font-heading text-2xl">{mergedContent.hero.headline}</h2>
+        <p className="mt-2 text-sm text-white/75">{mergedContent.hero.subhead}</p>
+        <div className="mt-4 flex flex-wrap gap-2 text-xs">
+          <span className="rounded-full bg-white px-3 py-1 text-[var(--color-primary)]">
+            {mergedContent.hero.ctaLabel}
+          </span>
+          <span className="rounded-full border border-white/40 px-3 py-1 text-white/90">
+            Call {phoneDisplay}
+          </span>
+        </div>
+      </div>
+      <div className="p-6">
+        <h3 className="font-heading text-[var(--color-primary)]">About {displayName}</h3>
+        <p className="mt-2 text-sm text-[var(--color-text-muted)]">{mergedContent.about}</p>
+        <div className="mt-4 grid grid-cols-3 gap-2 text-xs text-[var(--color-text-secondary)]">
+          {mergedContent.services.slice(0, 3).map((service) => (
+            <div key={service} className="rounded-lg bg-[var(--color-bg-cream)] px-2 py-2 text-center">
+              {service}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const liveSocialPreview = (
+    <div className="rounded-2xl border border-black/5 overflow-hidden bg-white">
+      <div className="bg-[var(--color-bg-dark)] text-white p-6">
+        <p className="text-xs uppercase tracking-[0.2em] text-white/60">Social post</p>
+        <h3 className="mt-3 font-heading text-xl">{mergedContent.hero.headline}</h3>
+        <p className="mt-2 text-sm text-white/75">{mergedContent.hero.subhead}</p>
+      </div>
+      <div className="p-5 text-xs text-[var(--color-text-secondary)]">
+        <p className="font-semibold text-[var(--color-primary)]">{displayName}</p>
+        <p className="mt-1 text-[var(--color-text-muted)]">{contactLine || phoneDisplay}</p>
+      </div>
+    </div>
+  );
+
+  const livePrintPreview = (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <div className="rounded-2xl border border-black/5 bg-white p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          Letterhead
+        </p>
+        <h3 className="mt-3 font-heading text-lg text-[var(--color-primary)]">{displayName}</h3>
+        <p className="mt-1 text-xs text-[var(--color-text-muted)]">{contactLine || phoneDisplay}</p>
+        <div className="mt-4 h-16 rounded-xl bg-[var(--color-bg-cream)]" />
+      </div>
+      <div className="rounded-2xl border border-black/5 bg-[var(--color-bg-cream)] p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          Appointment card
+        </p>
+        <p className="mt-3 font-heading text-lg text-[var(--color-primary)]">{displayName}</p>
+        <p className="mt-2 text-xs text-[var(--color-text-muted)]">{mergedContent.hero.subhead}</p>
+      </div>
+    </div>
+  );
+
+  const livePromotionalPreview = (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <div className="rounded-2xl border border-black/5 bg-white p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          Tote bag
+        </p>
+        <div className="mt-4 flex h-24 items-center justify-center rounded-xl bg-[var(--color-bg-dark)] px-4 text-center font-heading text-sm text-white">
+          {displayName}
+        </div>
+      </div>
+      <div className="rounded-2xl border border-black/5 bg-white p-5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          Coffee mug
+        </p>
+        <div className="mt-4 flex h-24 items-center justify-center rounded-full bg-[var(--color-bg-cream)] px-4 text-center font-heading text-sm text-[var(--color-primary)]">
+          {displayName}
+        </div>
+      </div>
+    </div>
+  );
+
+  const staticNote = (
+    <p className="text-xs text-[var(--color-text-muted)]">
+      Brand kit samples are static and keep the original look name.
+    </p>
   );
 
   const previewStyle = useMemo(
@@ -849,110 +953,185 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                   {/* Desktop Preview */}
                   {activeTab === 'desktop' && (
                     <div className="p-6">
-                      {previewImages.desktop.length ? (
-                        <div className="space-y-6">
-                          {previewImages.desktop.map((src, index) => (
-                            <div key={`${src}-${index}`}>
-                              {renderPreviewImage(
-                                src,
-                                `${look.title} desktop preview ${index + 1}`
-                              )}
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                            Personalized website preview
+                          </p>
+                          {livePreview}
+                        </div>
+
+                        {previewImages.desktop.length ? (
+                          <div className="space-y-3">
+                            <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                              Brand kit screenshot
+                            </p>
+                            {staticNote}
+                            <div className="space-y-6">
+                              {previewImages.desktop.map((src, index) => (
+                                <div key={`${src}-${index}`}>
+                                  {renderPreviewImage(
+                                    src,
+                                    `${look.title} desktop preview ${index + 1}`
+                                  )}
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
-                          Desktop preview coming soon.
-                        </div>
-                      )}
+                          </div>
+                        ) : (
+                          <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
+                            Desktop screenshot coming soon.
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 
                   {/* Mobile Preview */}
                   {activeTab === 'mobile' && (
                     <div className="p-6">
-                      {previewImages.mobile.length ? (
-                        <div className="mx-auto max-w-sm space-y-6">
-                          {previewImages.mobile.map((src, index) => (
-                            <div key={`${src}-${index}`}>
-                              {renderPreviewImage(
-                                src,
-                                `${look.title} mobile preview ${index + 1}`
-                              )}
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                            Personalized mobile preview
+                          </p>
+                          <div className="mx-auto max-w-sm">{livePreview}</div>
+                        </div>
+
+                        {previewImages.mobile.length ? (
+                          <div className="space-y-3">
+                            <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                              Brand kit screenshot
+                            </p>
+                            {staticNote}
+                            <div className="mx-auto max-w-sm space-y-6">
+                              {previewImages.mobile.map((src, index) => (
+                                <div key={`${src}-${index}`}>
+                                  {renderPreviewImage(
+                                    src,
+                                    `${look.title} mobile preview ${index + 1}`
+                                  )}
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
-                          Mobile preview coming soon.
-                        </div>
-                      )}
+                          </div>
+                        ) : (
+                          <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
+                            Mobile screenshot coming soon.
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 
                   {/* Print Materials Preview */}
                   {activeTab === 'print' && (
                     <div className="p-6">
-                      {previewImages.print.length ? (
-                        <div className="grid gap-6 md:grid-cols-2">
-                          {previewImages.print.map((src, index) => (
-                            <div key={`${src}-${index}`}>
-                              {renderPreviewImage(
-                                src,
-                                `${look.title} print preview ${index + 1}`
-                              )}
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                            Personalized print preview
+                          </p>
+                          {livePrintPreview}
+                        </div>
+
+                        {previewImages.print.length ? (
+                          <div className="space-y-3">
+                            <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                              Brand kit screenshot
+                            </p>
+                            {staticNote}
+                            <div className="grid gap-6 md:grid-cols-2">
+                              {previewImages.print.map((src, index) => (
+                                <div key={`${src}-${index}`}>
+                                  {renderPreviewImage(
+                                    src,
+                                    `${look.title} print preview ${index + 1}`
+                                  )}
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
-                          Print materials preview coming soon.
-                        </div>
-                      )}
+                          </div>
+                        ) : (
+                          <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
+                            Print materials preview coming soon.
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 
                   {/* Promotional Products Preview */}
                   {activeTab === 'promotional' && (
                     <div className="p-6">
-                      {previewImages.promotional.length ? (
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                          {previewImages.promotional.map((src, index) => (
-                            <div key={`${src}-${index}`}>
-                              {renderPreviewImage(
-                                src,
-                                `${look.title} promotional preview ${index + 1}`
-                              )}
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                            Personalized promotional preview
+                          </p>
+                          {livePromotionalPreview}
+                        </div>
+
+                        {previewImages.promotional.length ? (
+                          <div className="space-y-3">
+                            <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                              Brand kit screenshot
+                            </p>
+                            {staticNote}
+                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                              {previewImages.promotional.map((src, index) => (
+                                <div key={`${src}-${index}`}>
+                                  {renderPreviewImage(
+                                    src,
+                                    `${look.title} promotional preview ${index + 1}`
+                                  )}
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
-                          Promotional preview coming soon.
-                        </div>
-                      )}
+                          </div>
+                        ) : (
+                          <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
+                            Promotional preview coming soon.
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 
                   {/* Social Media Preview */}
                   {activeTab === 'social' && (
                     <div className="p-6">
-                      {previewImages.social.length ? (
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                          {previewImages.social.map((src, index) => (
-                            <div key={`${src}-${index}`}>
-                              {renderPreviewImage(
-                                src,
-                                `${look.title} social preview ${index + 1}`
-                              )}
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                            Personalized social preview
+                          </p>
+                          {liveSocialPreview}
+                        </div>
+
+                        {previewImages.social.length ? (
+                          <div className="space-y-3">
+                            <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+                              Brand kit screenshot
+                            </p>
+                            {staticNote}
+                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                              {previewImages.social.map((src, index) => (
+                                <div key={`${src}-${index}`}>
+                                  {renderPreviewImage(
+                                    src,
+                                    `${look.title} social preview ${index + 1}`
+                                  )}
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
-                          Social media preview coming soon.
-                        </div>
-                      )}
+                          </div>
+                        ) : (
+                          <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
+                            Social media preview coming soon.
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
