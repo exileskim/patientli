@@ -2,10 +2,11 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Header, Footer } from '@/components/layout';
 import { Container } from '@/components/ui';
 import looksData from '@/content/looks.json';
+import type { LookTokensV1 } from '@/modules/looks/domain/tokens.schema';
+import { cssVarsFromLookTokensV1 } from '@/modules/looks/ui/tokens';
 
 // Filter out non-Look products (plans, reports, etc.)
 const looks = looksData.filter(look =>
@@ -30,6 +31,31 @@ const styles = [
   'Neutral',
   'Playful',
 ];
+
+const defaultColors = {
+  primary: '#103034',
+  secondary: '#E6F2EF',
+  accent: '#E8F59E',
+  background: '#FFFFFF',
+};
+
+const defaultHeadingFont = '"ivypresto-display", Georgia, "Times New Roman", serif';
+const defaultBodyFont = '"Outfit", system-ui, -apple-system, sans-serif';
+
+function resolveFontFamily(fontName: string | undefined, fallback: string) {
+  if (!fontName) return fallback;
+  const normalized = fontName.toLowerCase();
+
+  if (normalized.includes('ivypresto')) {
+    return defaultHeadingFont;
+  }
+
+  if (normalized.includes('outfit')) {
+    return defaultBodyFont;
+  }
+
+  return fallback;
+}
 
 export default function LooksPage() {
   const [selectedPracticeType, setSelectedPracticeType] = useState<string | null>(null);
@@ -149,22 +175,77 @@ interface Look {
   slug: string;
   title: string;
   shortDescription: string;
-  bentoImage: string;
+  colors?: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+  };
+  fonts?: {
+    heading?: string;
+    body?: string;
+  };
 }
 
 function LookCard({ look }: { look: Look }) {
+  const colors = look.colors ?? defaultColors;
+  const tokens: LookTokensV1 = {
+    color: {
+      primary: colors.primary,
+      accent: colors.accent,
+      bg: colors.background,
+      surface: colors.secondary,
+      text: colors.primary,
+    },
+    typography: {
+      headingFamily: resolveFontFamily(look.fonts?.heading, defaultHeadingFont),
+      bodyFamily: resolveFontFamily(look.fonts?.body, defaultBodyFont),
+    },
+  };
+  const previewStyle = cssVarsFromLookTokensV1(tokens);
+
   return (
     <div className="group">
       {/* Bento Preview Image */}
       <Link href={`/looks-preview/${look.slug}`} className="block">
-        <div className="aspect-square bg-[var(--color-bg-cream)] rounded-2xl overflow-hidden mb-4 relative">
-          <Image
-            src={look.bentoImage}
-            alt={`${look.title} brand preview`}
-            width={400}
-            height={400}
-            className="w-full h-full object-cover"
-          />
+        <div
+          style={previewStyle}
+          className="aspect-square rounded-2xl overflow-hidden mb-4 border border-black/5 bg-white p-4"
+        >
+          <div className="grid h-full grid-cols-2 grid-rows-2 gap-3">
+            <div className="col-span-2 flex flex-col justify-between rounded-xl bg-[var(--color-bg-dark)] p-4 text-white">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/60">Live preview</p>
+              <div>
+                <p className="font-heading text-sm">Your Practice</p>
+                <p className="text-[10px] text-white/70">{look.title}</p>
+              </div>
+              <span className="inline-flex w-fit rounded-full bg-white px-3 py-1 text-[10px] text-[var(--color-primary)]">
+                Schedule a call
+              </span>
+            </div>
+            <div className="rounded-xl bg-[var(--color-bg-cream)] p-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-primary)] opacity-60">
+                Highlights
+              </p>
+              <p className="mt-2 text-[11px] leading-snug text-[var(--color-primary)] opacity-80 max-h-[48px] overflow-hidden">
+                {look.shortDescription}
+              </p>
+            </div>
+            <div className="rounded-xl border border-black/5 p-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-primary)] opacity-60">
+                Palette
+              </p>
+              <div className="mt-3 flex gap-2">
+                {[colors.primary, colors.accent, colors.secondary, colors.background].map((color) => (
+                  <span
+                    key={color}
+                    className="h-4 w-4 rounded-full border border-black/10"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </Link>
 
