@@ -14,10 +14,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#675840",
+      "secondary": "#d8cbc1",
+      "accent": "#418b62",
+      "background": "#faf8f3"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -71,10 +71,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#0b0b0b",
+      "secondary": "#c3c2c1",
+      "accent": "#3b3937",
+      "background": "#f4f3f0"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -128,10 +128,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#494643",
+      "secondary": "#f2f1ef",
+      "accent": "#b9b5ad",
+      "background": "#fdfdfd"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -182,10 +182,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#252221",
+      "secondary": "#b1ada7",
+      "accent": "#3f5063",
+      "background": "#ede7de"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -239,10 +239,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#352c37",
+      "secondary": "#d9c8c1",
+      "accent": "#3b3f61",
+      "background": "#f8f8f8"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -296,10 +296,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#16110f",
+      "secondary": "#dfc9aa",
+      "accent": "#a1765b",
+      "background": "#e6e5e3"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -344,10 +344,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#1d2326",
+      "secondary": "#d9cc73",
+      "accent": "#1b323a",
+      "background": "#f8f8f8"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -401,10 +401,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#43392b",
+      "secondary": "#f1e7d3",
+      "accent": "#d6a584",
+      "background": "#f4f4f2"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -456,10 +456,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#71482a",
+      "secondary": "#dad1c3",
+      "accent": "#c86f3e",
+      "background": "#fcfbf9"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -504,10 +504,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#393c37",
+      "secondary": "#d1d8cb",
+      "accent": "#235450",
+      "background": "#f9f9f9"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -561,10 +561,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#885e48",
+      "secondary": "#e4ddd5",
+      "accent": "#bf8a70",
+      "background": "#fbf9f7"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -616,10 +616,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#252114",
+      "secondary": "#a9aa9e",
+      "accent": "#575c32",
+      "background": "#f6efe3"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -673,10 +673,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#342412",
+      "secondary": "#a6976d",
+      "accent": "#3e5940",
+      "background": "#f0e4d0"
     },
     "fonts": {
       "heading": "IvyPresto Display",
@@ -730,10 +730,10 @@
       "modern"
     ],
     "colors": {
-      "primary": "#103034",
-      "secondary": "#E6F2EF",
-      "accent": "#E8F59E",
-      "background": "#FFFFFF"
+      "primary": "#15120d",
+      "secondary": "#e3d7c0",
+      "accent": "#5e584a",
+      "background": "#f8f4e6"
     },
     "fonts": {
       "heading": "IvyPresto Display",

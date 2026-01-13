@@ -35,6 +35,9 @@ export function cssVarsFromLookTokensV1(tokens: LookTokensV1): CSSProperties {
   const bg = tokens.color.bg;
   const surface = tokens.color.surface;
   const textPrimary = tokens.color.text ?? primary;
+  const textSecondary = `color-mix(in srgb, ${textPrimary} 80%, ${bg})`;
+  const textMuted = `color-mix(in srgb, ${textPrimary} 65%, ${bg})`;
+  const border = `color-mix(in srgb, ${primary} 18%, ${bg})`;
 
   return {
     '--color-primary': primary,
@@ -47,14 +50,14 @@ export function cssVarsFromLookTokensV1(tokens: LookTokensV1): CSSProperties {
     '--color-bg-dark': primary,
     '--color-bg-white': bg,
     '--color-bg-mint': surface,
-    '--color-bg-cream': bg,
+    '--color-bg-cream': surface,
 
     '--color-text-primary': textPrimary,
-    '--color-text-secondary': textPrimary,
-    '--color-text-muted': textPrimary,
+    '--color-text-secondary': textSecondary,
+    '--color-text-muted': textMuted,
+    '--color-border': border,
 
     '--font-heading': tokens.typography.headingFamily,
     '--font-body': tokens.typography.bodyFamily,
   } as CSSProperties;
 }
-
