@@ -4,9 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button, Container } from '@/components/ui';
-import looksData from '@/content/looks.json';
-import type { LookTokensV1 } from '@/modules/looks/domain/tokens.schema';
-import { cssVarsFromLookTokensV1 } from '@/modules/looks/ui/tokens';
 
 interface MegaLink {
   label: string;
@@ -21,21 +18,13 @@ interface MegaImageLink extends MegaLink {
   height: number;
 }
 
-interface MegaThumbnailLink extends MegaLink {
-  image?: string;
-  imageAlt?: string;
-  width?: number;
-  height?: number;
-  lookSlug?: string;
-}
-
 interface MegaMenu {
   columns: MegaLink[][];
   featured?: MegaImageLink[];
   aside?: {
     headline: MegaLink;
     sectionLabel: string;
-    thumbnails: MegaThumbnailLink[];
+    thumbnails: MegaImageLink[];
   };
 }
 
@@ -157,17 +146,26 @@ const navigation: NavItem[] = [
           {
             label: 'General',
             href: '/brand/general-dentistry',
-            lookSlug: 'lumena',
+            image: '/images/looks/patientli-brand-kit-bentobox-lumena.webp',
+            imageAlt: 'Patientli Brand Kit Lumena',
+            width: 566,
+            height: 566,
           },
           {
             label: 'Ortho',
             href: '/brand/orthodontics',
-            lookSlug: 'arches',
+            image: '/images/looks/patientli-brand-kit-bentobox-arches.webp',
+            imageAlt: 'Patientli Brand Kit Arches',
+            width: 566,
+            height: 566,
           },
           {
             label: 'Cosmetic',
             href: '/brand/cosmetic-surgery',
-            lookSlug: 'aura',
+            image: '/images/looks/patientli-brand-kit-bentobox-aura-dental.webp',
+            imageAlt: 'Patientli Brand Kit Aura Dental',
+            width: 566,
+            height: 566,
           },
         ],
       },
@@ -224,108 +222,6 @@ const navigation: NavItem[] = [
     },
   },
 ];
-
-type LookThumbnailData = {
-  slug: string;
-  title: string;
-  shortDescription: string;
-  colors?: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    background: string;
-  };
-  fonts?: {
-    heading?: string;
-    body?: string;
-  };
-};
-
-const defaultColors = {
-  primary: '#103034',
-  secondary: '#E6F2EF',
-  accent: '#E8F59E',
-  background: '#FFFFFF',
-};
-
-const defaultHeadingFont = '"ivypresto-display", Georgia, "Times New Roman", serif';
-const defaultBodyFont = '"Outfit", system-ui, -apple-system, sans-serif';
-
-function resolveFontFamily(fontName: string | undefined, fallback: string) {
-  if (!fontName) return fallback;
-  const normalized = fontName.toLowerCase();
-
-  if (normalized.includes('ivypresto')) {
-    return defaultHeadingFont;
-  }
-
-  if (normalized.includes('outfit')) {
-    return defaultBodyFont;
-  }
-
-  return fallback;
-}
-
-const lookThumbnails = (looksData as LookThumbnailData[]).map((look) => ({
-  slug: look.slug,
-  title: look.title,
-  shortDescription: look.shortDescription,
-  colors: look.colors,
-  fonts: look.fonts,
-}));
-const lookThumbnailBySlug = new Map(
-  lookThumbnails.map((look) => [look.slug, look])
-);
-
-function LookThumbnailCard({ look }: { look: LookThumbnailData }) {
-  const colors = look.colors ?? defaultColors;
-  const tokens: LookTokensV1 = {
-    color: {
-      primary: colors.primary,
-      accent: colors.accent,
-      bg: colors.background,
-      surface: colors.secondary,
-      text: colors.primary,
-    },
-    typography: {
-      headingFamily: resolveFontFamily(look.fonts?.heading, defaultHeadingFont),
-      bodyFamily: resolveFontFamily(look.fonts?.body, defaultBodyFont),
-    },
-  };
-  const previewStyle = cssVarsFromLookTokensV1(tokens);
-
-  return (
-    <div
-      style={previewStyle}
-      className="aspect-square rounded-2xl border border-black/5 bg-white p-3"
-    >
-      <div className="flex h-full flex-col gap-3">
-        <div className="flex-1 rounded-xl bg-[var(--color-bg-dark)] p-3 text-white">
-          <p className="text-[9px] uppercase tracking-[0.2em] text-white/60">Live preview</p>
-          <p className="mt-2 font-heading text-xs">{look.title}</p>
-          <p className="text-[10px] text-white/70">Your Practice</p>
-        </div>
-        <div className="rounded-xl bg-[var(--color-bg-cream)] p-2">
-          <p className="text-[9px] uppercase tracking-[0.2em] text-[var(--color-primary)] opacity-60">
-            Highlights
-          </p>
-          <p className="mt-1 text-[10px] leading-snug text-[var(--color-primary)] opacity-80 max-h-8 overflow-hidden">
-            {look.shortDescription}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {[colors.primary, colors.accent, colors.secondary].map((color) => (
-            <span
-              key={color}
-              className="h-3 w-3 rounded-full border border-black/10"
-              style={{ backgroundColor: color }}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 interface HeaderProps {
   variant?: 'light' | 'dark';
@@ -448,34 +344,22 @@ export function Header({ variant = 'dark' }: HeaderProps) {
                               </p>
 
                               <div className="grid grid-cols-3 gap-4">
-                                {item.mega.aside.thumbnails.map((thumb) => {
-                                  const look = thumb.lookSlug
-                                    ? lookThumbnailBySlug.get(thumb.lookSlug)
-                                    : null;
-
-                                  return (
-                                    <Link key={thumb.href} href={thumb.href} className="group">
-                                      <div className="overflow-hidden rounded-2xl bg-white/5">
-                                        {look ? (
-                                          <LookThumbnailCard look={look} />
-                                        ) : thumb.image ? (
-                                          <Image
-                                            src={thumb.image}
-                                            alt={thumb.imageAlt ?? ''}
-                                            width={thumb.width ?? 0}
-                                            height={thumb.height ?? 0}
-                                            className="h-auto w-full"
-                                          />
-                                        ) : (
-                                          <div className="aspect-square rounded-2xl bg-[var(--color-bg-cream)]" />
-                                        )}
-                                      </div>
-                                      <p className={`mt-2 text-sm ${isDark ? 'text-white/80' : 'text-[var(--color-text-secondary)]'}`}>
-                                        {thumb.label}
-                                      </p>
-                                    </Link>
-                                  );
-                                })}
+                                {item.mega.aside.thumbnails.map((thumb) => (
+                                  <Link key={thumb.href} href={thumb.href} className="group">
+                                    <div className="overflow-hidden rounded-2xl bg-white/5">
+                                      <Image
+                                        src={thumb.image}
+                                        alt={thumb.imageAlt}
+                                        width={thumb.width}
+                                        height={thumb.height}
+                                        className="h-auto w-full"
+                                      />
+                                    </div>
+                                    <p className={`mt-2 text-sm ${isDark ? 'text-white/80' : 'text-[var(--color-text-secondary)]'}`}>
+                                      {thumb.label}
+                                    </p>
+                                  </Link>
+                                ))}
                               </div>
                             </div>
                           ) : null}

@@ -1084,7 +1084,13 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
                 <p className="text-[var(--color-text-secondary)] mb-4">
                   Get started today to use {look.title} as the basis for your brand and website.
                 </p>
-                <Button href="/demo" variant="primary" fullWidth>
+                <Button
+                  variant="primary"
+                  fullWidth
+                  onClick={handleContinueToPricing}
+                  disabled={isSaving || !practice.name}
+                  isLoading={isSaving}
+                >
                   Get started with {look.title}
                 </Button>
                 <p className="text-sm text-[var(--color-text-muted)] mt-4 flex items-start gap-2">
