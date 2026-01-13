@@ -64,6 +64,29 @@ const previewTabs: { id: PreviewTab; label: string; icon: React.ReactNode }[] = 
   },
 ];
 
+type LookPreviewPayload = {
+  desktop?: string[] | string;
+  mobile?: string[] | string;
+  print?: string[] | string;
+  promotional?: string[] | string;
+  social?: string[] | string;
+};
+
+type LookEntry = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  shortDescription?: string;
+  colors?: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+  };
+  previews?: LookPreviewPayload;
+};
+
 
 const accentPresets = [
   { label: 'Lime', value: '#E8F59E' },
@@ -117,7 +140,10 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
   const [isSaving, setIsSaving] = useState(false);
 
   const lookSlug = slug;
-  const look = useMemo(() => looksData.find((entry) => entry.slug === lookSlug), [lookSlug]);
+  const look = useMemo(
+    () => (looksData as LookEntry[]).find((entry) => entry.slug === lookSlug),
+    [lookSlug]
+  );
 
   const baseTokens = useMemo<LookTokensV1>(() => {
     const headingDefault = fontPairs[0].headingFamily;
@@ -165,7 +191,7 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
   );
 
   const previewImages = useMemo(() => {
-    const previews = look?.previews ?? {};
+    const previews: LookPreviewPayload = look?.previews ?? {};
     return {
       desktop: normalizePreview(previews.desktop),
       mobile: normalizePreview(previews.mobile),
