@@ -89,6 +89,15 @@ const fontPairs = [
   },
 ];
 
+function normalizePreview(value: unknown): string[] {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value.filter((entry): entry is string => typeof entry === 'string' && entry.length > 0);
+  }
+  if (typeof value === 'string') return [value];
+  return [];
+}
+
 export default function LooksPreviewClient({ slug }: { slug: string }) {
   const [activeTab, setActiveTab] = useState<PreviewTab>('desktop');
   const router = useRouter();
@@ -155,6 +164,17 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
     [mergedTokens]
   );
 
+  const previewImages = useMemo(() => {
+    const previews = look?.previews ?? {};
+    return {
+      desktop: normalizePreview(previews.desktop),
+      mobile: normalizePreview(previews.mobile),
+      print: normalizePreview(previews.print),
+      promotional: normalizePreview(previews.promotional),
+      social: normalizePreview(previews.social),
+    };
+  }, [look]);
+
   const practice = useMemo(
     () => ({
       name: practiceName.trim(),
@@ -177,41 +197,6 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
       practiceZip,
     ]
   );
-
-  const domainLabel = useMemo(() => {
-    const slugified = practice.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '')
-      .slice(0, 32);
-    return `${slugified || 'yourpractice'}.com`;
-  }, [practice.name]);
-
-  const locationLine = useMemo(() => {
-    const line1 = [practiceAddress1.trim(), practiceAddress2.trim()].filter(Boolean).join(' ');
-    const line2 = [practiceCity.trim(), practiceState.trim(), practiceZip.trim()]
-      .filter(Boolean)
-      .join(' ');
-    return [line1, line2].filter(Boolean).join(', ');
-  }, [practiceAddress1, practiceAddress2, practiceCity, practiceState, practiceZip]);
-
-  const contactLine = useMemo(() => {
-    const phone = practicePhone.trim();
-    return [locationLine, phone].filter(Boolean).join(' • ');
-  }, [locationLine, practicePhone]);
-
-  const phoneLabel = useMemo(
-    () => practicePhone.trim() || '(555) 555-5555',
-    [practicePhone]
-  );
-
-  const logoInitials = useMemo(() => {
-    const parts = practiceName.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return 'PL';
-    return parts
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase() ?? '')
-      .join('');
-  }, [practiceName]);
 
   useEffect(() => {
     const encoded = searchParams.get('c');
@@ -812,213 +797,129 @@ export default function LooksPreviewClient({ slug }: { slug: string }) {
 
             {/* Preview Area */}
             <div className="relative">
-              <div data-look-preview style={previewStyle} className="bg-[var(--color-bg-cream)] rounded-3xl overflow-hidden">
-                {/* Desktop Preview */}
-                {activeTab === 'desktop' && (
-                  <div className="p-6">
-                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                      {/* Browser Chrome */}
-                      <div className="bg-gray-100 px-4 py-3 flex items-center gap-2">
-                        <div className="flex gap-1.5">
-                          <div className="w-3 h-3 rounded-full bg-red-400" />
-                          <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                          <div className="w-3 h-3 rounded-full bg-green-400" />
-                        </div>
-                        <div className="flex-1 bg-white rounded-md px-4 py-1 text-xs text-gray-400 text-center">
-                          {domainLabel}
-                        </div>
-                      </div>
-                      {/* Website Mockup */}
-                      <div className="aspect-[16/10] bg-[var(--color-bg-dark)] relative overflow-hidden">
-                        {/* Hero section mockup */}
-                        <div className="absolute inset-0 p-8">
-                          {/* Nav */}
-                          <div className="flex justify-between items-center mb-16">
-                            <div className="flex items-center gap-3">
-                              {practiceLogoUrl.trim() ? (
-                                <img
-                                  src={practiceLogoUrl.trim()}
-                                  alt={`${practice.name} logo`}
-                                  className="h-8 w-8 rounded-full object-cover border border-white/20 bg-white/10"
-                                />
-                              ) : (
-                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[10px] font-medium text-white">
-                                  {logoInitials}
-                                </div>
-                              )}
-                              <span className="text-white font-heading text-xl">{practice.name}</span>
-                            </div>
-                            <div className="flex gap-4 text-white/60 text-sm">
-                              <span>Services</span>
-                              <span>About</span>
-                              <span>Blog</span>
-                            </div>
-                          </div>
-                          {/* Hero content */}
-                          <div className="grid grid-cols-2 gap-8 items-center h-[60%]">
-                            <div>
-                              <p className="text-white/60 text-xs uppercase tracking-wider mb-2">Healthcare</p>
-                              <h2 className="text-white text-2xl font-heading mb-4">
-                                {mergedContent.hero.headline}
-                              </h2>
-                              <p className="text-white/70 text-sm mb-6">
-                                {mergedContent.hero.subhead}
-                              </p>
-                              <div className="flex gap-3">
-                                <span className="px-4 py-2 bg-white text-[var(--color-primary)] text-xs rounded-full">
-                                  {mergedContent.hero.ctaLabel}
-                                </span>
-                                <span className="px-4 py-2 border border-white/30 text-white text-xs rounded-full">
-                                  Call {phoneLabel}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex justify-end">
-                              <div className="w-40 h-40 rounded-full bg-white/20" />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      {/* More sections mockup */}
-                      <div className="p-8 space-y-8">
-                        <div className="text-center">
-                          <h3 className="text-xl font-heading text-[var(--color-primary)] mb-2">
-                            About {practice.name}
-                          </h3>
-                          <p className="text-sm text-[var(--color-text-muted)]">
-                            {mergedContent.about}
-                          </p>
-                        </div>
-                        <div className="grid grid-cols-3 gap-4">
-                          {mergedContent.services.slice(0, 3).map((service) => (
-                            <div
-                              key={service}
-                              className="flex items-center justify-center rounded-xl bg-[var(--color-bg-cream)] text-xs text-[var(--color-text-secondary)] px-2 text-center"
-                            >
-                              {service}
-                            </div>
+              <div
+                data-look-preview
+                style={previewStyle}
+                className="bg-[var(--color-bg-cream)] rounded-3xl border border-[var(--color-border)] shadow-sm overflow-hidden"
+              >
+                <div data-look-preview-scroll className="max-h-[72vh] min-h-[520px] overflow-y-auto">
+                  {/* Desktop Preview */}
+                  {activeTab === 'desktop' && (
+                    <div className="p-6">
+                      {previewImages.desktop.length ? (
+                        <div className="space-y-6">
+                          {previewImages.desktop.map((src, index) => (
+                            <img
+                              key={`${src}-${index}`}
+                              src={src}
+                              alt={`${look.title} desktop preview ${index + 1}`}
+                              className="w-full rounded-2xl border border-black/5 shadow-lg"
+                              loading="lazy"
+                            />
                           ))}
                         </div>
-                      </div>
+                      ) : (
+                        <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
+                          Desktop preview coming soon.
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Mobile Preview */}
-                {activeTab === 'mobile' && (
-                  <div className="p-6 flex justify-center">
-                    <div className="w-[280px] bg-white rounded-[2.5rem] shadow-xl overflow-hidden border-8 border-gray-900">
-                      {/* Phone notch */}
-                      <div className="bg-gray-900 h-6 flex justify-center">
-                        <div className="w-20 h-4 bg-black rounded-b-xl" />
-                      </div>
-                      {/* Screen content */}
-                      <div className="aspect-[9/16] bg-[var(--color-bg-dark)] relative overflow-hidden">
-                        <div className="p-4">
-                          <span className="text-white font-heading">{practice.name}</span>
-                          <div className="mt-12">
-                            <p className="text-white/60 text-xs uppercase tracking-wider mb-2">Healthcare</p>
-                            <h2 className="text-white text-lg font-heading mb-3">
-                              {mergedContent.hero.headline}
-                            </h2>
-                            <p className="text-white/70 text-xs mb-4">
-                              {mergedContent.hero.subhead}
-                            </p>
-                            <span className="inline-block px-4 py-2 bg-white text-[var(--color-primary)] text-xs rounded-full">
-                              {mergedContent.hero.ctaLabel}
-                            </span>
-                          </div>
+                  {/* Mobile Preview */}
+                  {activeTab === 'mobile' && (
+                    <div className="p-6">
+                      {previewImages.mobile.length ? (
+                        <div className="mx-auto max-w-sm space-y-6">
+                          {previewImages.mobile.map((src, index) => (
+                            <img
+                              key={`${src}-${index}`}
+                              src={src}
+                              alt={`${look.title} mobile preview ${index + 1}`}
+                              className="w-full rounded-2xl border border-black/5 shadow-lg"
+                              loading="lazy"
+                            />
+                          ))}
                         </div>
-                      </div>
+                      ) : (
+                        <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
+                          Mobile preview coming soon.
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Print Materials Preview */}
-                {activeTab === 'print' && (
-                  <div className="p-6">
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* Business Card */}
-                      <div className="bg-white rounded-xl p-4 shadow-lg">
-                        <div className="aspect-[1.75/1] bg-[var(--color-bg-dark)] rounded-lg p-4 flex flex-col justify-between">
-                          <span className="text-white font-heading text-sm">{practice.name}</span>
-                          <div className="text-white/70 text-xs">
-                            <p>Dr. Jane Smith</p>
-                            <p>General Dentistry</p>
-                          </div>
+                  {/* Print Materials Preview */}
+                  {activeTab === 'print' && (
+                    <div className="p-6">
+                      {previewImages.print.length ? (
+                        <div className="grid gap-6 md:grid-cols-2">
+                          {previewImages.print.map((src, index) => (
+                            <img
+                              key={`${src}-${index}`}
+                              src={src}
+                              alt={`${look.title} print preview ${index + 1}`}
+                              className="w-full rounded-2xl border border-black/5 shadow-lg bg-white"
+                              loading="lazy"
+                            />
+                          ))}
                         </div>
-                        <p className="text-center text-xs text-[var(--color-text-muted)] mt-2">Business Card</p>
-                      </div>
-                      {/* Letterhead */}
-                      <div className="bg-white rounded-xl p-4 shadow-lg">
-                        <div className="aspect-[8.5/11] bg-white border border-gray-200 rounded-lg p-4">
-                          <span className="text-[var(--color-primary)] font-heading text-sm">{practice.name}</span>
-                          <div className="mt-4 space-y-2">
-                            <div className="h-2 bg-gray-100 rounded w-3/4" />
-                            <div className="h-2 bg-gray-100 rounded w-full" />
-                            <div className="h-2 bg-gray-100 rounded w-2/3" />
-                          </div>
+                      ) : (
+                        <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
+                          Print materials preview coming soon.
                         </div>
-                        <p className="text-center text-xs text-[var(--color-text-muted)] mt-2">Letterhead</p>
-                      </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Promotional Products Preview */}
-                {activeTab === 'promotional' && (
-                  <div className="p-6">
-                    <div className="grid grid-cols-3 gap-4">
-                      {/* Tote Bag */}
-                      <div className="bg-white rounded-xl p-4 shadow-lg">
-                        <div className="aspect-square bg-[var(--color-bg-cream)] rounded-lg flex items-center justify-center">
-                          <span className="text-[var(--color-primary)] font-heading">{practice.name}</span>
+                  {/* Promotional Products Preview */}
+                  {activeTab === 'promotional' && (
+                    <div className="p-6">
+                      {previewImages.promotional.length ? (
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                          {previewImages.promotional.map((src, index) => (
+                            <img
+                              key={`${src}-${index}`}
+                              src={src}
+                              alt={`${look.title} promotional preview ${index + 1}`}
+                              className="w-full rounded-2xl border border-black/5 shadow-lg bg-white"
+                              loading="lazy"
+                            />
+                          ))}
                         </div>
-                        <p className="text-center text-xs text-[var(--color-text-muted)] mt-2">Tote Bag</p>
-                      </div>
-                      {/* Mug */}
-                      <div className="bg-white rounded-xl p-4 shadow-lg">
-                        <div className="aspect-square bg-[var(--color-bg-mint)] rounded-lg flex items-center justify-center">
-                          <span className="text-[var(--color-primary)] font-heading text-sm">{practice.name}</span>
+                      ) : (
+                        <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
+                          Promotional preview coming soon.
                         </div>
-                        <p className="text-center text-xs text-[var(--color-text-muted)] mt-2">Coffee Mug</p>
-                      </div>
-                      {/* ID Badge */}
-                      <div className="bg-white rounded-xl p-4 shadow-lg">
-                        <div className="aspect-[2/3] bg-white border border-gray-200 rounded-lg p-2 flex flex-col items-center">
-                          <div className="w-8 h-8 rounded-full bg-[var(--color-bg-cream)] mb-2" />
-                          <span className="text-[var(--color-primary)] font-heading text-xs">{practice.name}</span>
-                          <p className="text-[6px] text-gray-400 mt-1">Dr. Jane Smith</p>
-                        </div>
-                        <p className="text-center text-xs text-[var(--color-text-muted)] mt-2">ID Badge</p>
-                      </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Social Media Preview */}
-                {activeTab === 'social' && (
-                  <div className="p-6">
-                    <div className="grid grid-cols-3 gap-4">
-                      {[1, 2, 3, 4, 5, 6].map(i => (
-                        <div key={i} className="aspect-square bg-white rounded-xl shadow-lg overflow-hidden">
-                          <div className={`w-full h-full ${
-                            i % 3 === 0 ? 'bg-[var(--color-bg-dark)]' :
-                            i % 3 === 1 ? 'bg-[var(--color-bg-mint)]' :
-                            'bg-[var(--color-bg-peach)]'
-                          } flex items-center justify-center`}>
-                            <span className={`font-heading ${i % 3 === 0 ? 'text-white' : 'text-[var(--color-primary)]'}`}>
-                              {practice.name}
-                            </span>
-                          </div>
+                  {/* Social Media Preview */}
+                  {activeTab === 'social' && (
+                    <div className="p-6">
+                      {previewImages.social.length ? (
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                          {previewImages.social.map((src, index) => (
+                            <img
+                              key={`${src}-${index}`}
+                              src={src}
+                              alt={`${look.title} social preview ${index + 1}`}
+                              className="w-full rounded-2xl border border-black/5 shadow-lg bg-white"
+                              loading="lazy"
+                            />
+                          ))}
                         </div>
-                      ))}
+                      ) : (
+                        <div className="rounded-2xl bg-white px-6 py-8 text-sm text-[var(--color-text-muted)]">
+                          Social media preview coming soon.
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
 
-                {/* Scroll hint */}
-                <div className="flex items-center justify-center gap-2 py-4 text-[var(--color-text-muted)]">
+                <div className="flex items-center justify-center gap-2 border-t border-[var(--color-border)] bg-white/70 py-3 text-[var(--color-text-muted)]">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
                   </svg>
