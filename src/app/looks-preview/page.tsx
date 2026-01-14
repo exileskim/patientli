@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Header, Footer } from '@/components/layout';
 import { Container } from '@/components/ui';
 import looksData from '@/content/looks.json';
+import { LookThumbnail } from '@/modules/looks/ui/look-thumbnail';
 
 // Filter out non-Look products (plans, reports, etc.)
 const looks = looksData.filter(look =>
@@ -149,7 +149,6 @@ interface Look {
   slug: string;
   title: string;
   shortDescription: string;
-  bentoImage: string;
 }
 
 function LookCard({ look }: { look: Look }) {
@@ -158,13 +157,7 @@ function LookCard({ look }: { look: Look }) {
       {/* Bento Preview Image */}
       <Link href={`/looks-preview/${look.slug}`} className="block">
         <div className="aspect-square bg-[var(--color-bg-cream)] rounded-2xl overflow-hidden mb-4 relative">
-          <Image
-            src={look.bentoImage}
-            alt={`${look.title} brand preview`}
-            width={400}
-            height={400}
-            className="w-full h-full object-cover"
-          />
+          <LookThumbnail lookSlug={look.slug} className="h-full w-full" />
         </div>
       </Link>
 

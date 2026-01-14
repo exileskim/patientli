@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button, Container } from '@/components/ui';
+import { LookThumbnail } from '@/modules/looks/ui/look-thumbnail';
 
 interface MegaLink {
   label: string;
@@ -12,10 +13,11 @@ interface MegaLink {
 }
 
 interface MegaImageLink extends MegaLink {
-  image: string;
-  imageAlt: string;
-  width: number;
-  height: number;
+  image?: string;
+  imageAlt?: string;
+  width?: number;
+  height?: number;
+  lookSlug?: string;
 }
 
 interface MegaMenu {
@@ -146,26 +148,17 @@ const navigation: NavItem[] = [
           {
             label: 'General',
             href: '/brand/general-dentistry',
-            image: '/images/looks/patientli-brand-kit-bentobox-lumena.webp',
-            imageAlt: 'Patientli Brand Kit Lumena',
-            width: 566,
-            height: 566,
+            lookSlug: 'lumena',
           },
           {
             label: 'Ortho',
             href: '/brand/orthodontics',
-            image: '/images/looks/patientli-brand-kit-bentobox-arches.webp',
-            imageAlt: 'Patientli Brand Kit Arches',
-            width: 566,
-            height: 566,
+            lookSlug: 'arches',
           },
           {
             label: 'Cosmetic',
             href: '/brand/cosmetic-surgery',
-            image: '/images/looks/patientli-brand-kit-bentobox-aura-dental.webp',
-            imageAlt: 'Patientli Brand Kit Aura Dental',
-            width: 566,
-            height: 566,
+            lookSlug: 'aura',
           },
         ],
       },
@@ -347,13 +340,21 @@ export function Header({ variant = 'dark' }: HeaderProps) {
                                 {item.mega.aside.thumbnails.map((thumb) => (
                                   <Link key={thumb.href} href={thumb.href} className="group">
                                     <div className="overflow-hidden rounded-2xl bg-white/5">
-                                      <Image
-                                        src={thumb.image}
-                                        alt={thumb.imageAlt}
-                                        width={thumb.width}
-                                        height={thumb.height}
-                                        className="h-auto w-full"
-                                      />
+                                      {thumb.lookSlug ? (
+                                        <LookThumbnail
+                                          lookSlug={thumb.lookSlug}
+                                          practiceName="Your Practice"
+                                          className="aspect-square w-full"
+                                        />
+                                      ) : thumb.image ? (
+                                        <Image
+                                          src={thumb.image}
+                                          alt={thumb.imageAlt ?? ''}
+                                          width={thumb.width ?? 566}
+                                          height={thumb.height ?? 566}
+                                          className="h-auto w-full"
+                                        />
+                                      ) : null}
                                     </div>
                                     <p className={`mt-2 text-sm ${isDark ? 'text-white/80' : 'text-[var(--color-text-secondary)]'}`}>
                                       {thumb.label}
@@ -372,14 +373,16 @@ export function Header({ variant = 'dark' }: HeaderProps) {
                                     {feature.label}
                                   </h3>
                                   <div className="mt-4 overflow-hidden rounded-2xl bg-white/5">
-                                    <Image
-                                      src={feature.image}
-                                      alt={feature.imageAlt}
-                                      width={feature.width}
-                                      height={feature.height}
-                                      sizes="(max-width: 1024px) 100vw, 360px"
-                                      className="h-auto w-full"
-                                    />
+                                    {feature.image ? (
+                                      <Image
+                                        src={feature.image}
+                                        alt={feature.imageAlt ?? ''}
+                                        width={feature.width ?? 1200}
+                                        height={feature.height ?? 800}
+                                        sizes="(max-width: 1024px) 100vw, 360px"
+                                        className="h-auto w-full"
+                                      />
+                                    ) : null}
                                   </div>
                                 </Link>
                               ))}

@@ -197,7 +197,6 @@ function extractProducts(sql) {
     description: p.content,
     shortDescription: p.excerpt || p.content.substring(0, 200),
     featuredImage: `/images/looks/${p.slug}.webp`,
-    bentoImage: `/images/looks/${p.slug}-bento.webp`,
     practiceTypes: ['General Dentistry'], // Default, would need postmeta
     tags: ['modern'], // Default, would need term relationships
     colors: {
